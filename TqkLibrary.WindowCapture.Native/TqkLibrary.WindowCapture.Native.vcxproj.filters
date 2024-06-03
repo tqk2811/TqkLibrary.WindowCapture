@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Win10_1903">
+      <UniqueIdentifier>{8dba567a-5be2-405f-9804-2f1f3a00f3c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Win10_1903\Header Files">
+      <UniqueIdentifier>{26f0c4ce-617d-4529-97c2-46810609ccf3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Win10_1903\Source Files">
+      <UniqueIdentifier>{37295491-60ea-4ac7-8326-5b7dc9f48de3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DesktopDuplication">
+      <UniqueIdentifier>{7bd1da31-10d6-4b9e-85e4-9ac3c092f202}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DesktopDuplication\Header Files">
+      <UniqueIdentifier>{2a278ec6-ecbf-4940-9496-be99da7dd645}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DesktopDuplication\Source Files">
+      <UniqueIdentifier>{86868769-8731-49ae-adfb-0d4f2fa92d0a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Bitblt">
+      <UniqueIdentifier>{1cfa800e-f1a4-4b7b-acc3-4571e0902812}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Bitblt\Header Files">
+      <UniqueIdentifier>{f6aa5627-9c87-4657-bea8-2db7f824a147}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Bitblt\Source Files">
+      <UniqueIdentifier>{bbfa25fb-a3fc-41ca-97e3-141840cf640b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="pch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

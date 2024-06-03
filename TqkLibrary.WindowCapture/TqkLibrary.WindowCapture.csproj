@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0-windows7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Platforms>AnyCPU;x64;x86</Platforms>
+  </PropertyGroup>
+
+	<ItemGroup Condition="'$(Platform)' == 'x86'">
+		<None Include="..\x86\$(Configuration)\TqkLibrary.WindowCapture.Native.dll" Link="runtimes\win-x86\native\TqkLibrary.WindowCapture.Native.dll">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Include="..\x86\$(Configuration)\TqkLibrary.WindowCapture.Native.pdb" Link="runtimes\win-x86\native\TqkLibrary.WindowCapture.Native.pdb">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(Platform)' == 'x64'">
+		<None Include="..\x64\$(Configuration)\TqkLibrary.WindowCapture.Native.dll" Link="runtimes\win-x64\native\TqkLibrary.WindowCapture.Native.dll">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Include="..\x64\$(Configuration)\TqkLibrary.WindowCapture.Native.pdb" Link="runtimes\win-x64\native\TqkLibrary.WindowCapture.Native.pdb">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+	
+	
+</Project>
