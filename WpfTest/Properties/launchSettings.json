@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "ConsoleTest": {
+    "WpfTest": {
       "commandName": "Project",
       "nativeDebugging": true
     }

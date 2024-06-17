@@ -34,24 +34,89 @@
     <Filter Include="Bitblt">
       <UniqueIdentifier>{1cfa800e-f1a4-4b7b-acc3-4571e0902812}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Bitblt\Header Files">
-      <UniqueIdentifier>{f6aa5627-9c87-4657-bea8-2db7f824a147}</UniqueIdentifier>
+    <Filter Include="D3D">
+      <UniqueIdentifier>{f812c001-de79-4040-9859-d660ac52d748}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Bitblt\Source Files">
-      <UniqueIdentifier>{bbfa25fb-a3fc-41ca-97e3-141840cf640b}</UniqueIdentifier>
+    <Filter Include="D3D\Header Files">
+      <UniqueIdentifier>{d5a4ce14-ab26-4ab9-99ee-81098b0440b3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="D3D\Source Files">
+      <UniqueIdentifier>{84010429-0a70-4b42-b1c1-d2e8e8993b91}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="D3D\Resource Files">
+      <UniqueIdentifier>{e9b9e7a4-115a-4a8a-8d60-6190e38ad00e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="pch.h">
+    <ClInclude Include="PixelShaderClass.hpp">
+      <Filter>D3D\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VertexShaderClass.hpp">
+      <Filter>D3D\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Exports.hpp">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WinApi.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Directx.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Gdi.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D3DClass.hpp">
+      <Filter>D3D\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderTextureSurfaceClass.hpp">
+      <Filter>D3D\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderCapture.hpp">
+      <Filter>D3D</Filter>
+    </ClInclude>
+    <ClInclude Include="BitbltCapture.hpp">
+      <Filter>Bitblt</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseCapture.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="InputTextureClass.hpp">
+      <Filter>D3D\Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="dllmain.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="pch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="PixelShaderClass.cpp">
+      <Filter>D3D\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="VertexShaderClass.cpp">
+      <Filter>D3D\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D3DClass.cpp">
+      <Filter>D3D\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderTextureSurfaceClass.cpp">
+      <Filter>D3D\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderCapture.cpp">
+      <Filter>D3D</Filter>
+    </ClCompile>
+    <ClCompile Include="BitbltCapture.cpp">
+      <Filter>Bitblt</Filter>
+    </ClCompile>
+    <ClCompile Include="InputTextureClass.cpp">
+      <Filter>D3D\Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="VertexShader.hlsl">
+      <Filter>D3D\Resource Files</Filter>
+    </FxCompile>
+    <FxCompile Include="PixelShader.hlsl">
+      <Filter>D3D\Resource Files</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

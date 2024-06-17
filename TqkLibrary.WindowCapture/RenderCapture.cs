@@ -1,0 +1,36 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace TqkLibrary.WindowCapture
+{
+    public class RenderCapture : BaseNative
+    {
+        [DllImport("TqkLibrary.WindowCapture.Native.dll", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr RenderCapture_Alloc();
+
+        [DllImport("TqkLibrary.WindowCapture.Native.dll", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void RenderCapture_Free(ref IntPtr pointer);
+
+        [DllImport("TqkLibrary.WindowCapture.Native.dll", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
+        public static extern bool RenderCapture_Render(IntPtr pointer, IntPtr capture, IntPtr surface, bool isNewSurface, ref bool isNewtargetView);
+
+
+
+
+
+
+        readonly BaseCapture _baseCapture;
+        public RenderCapture(BaseCapture baseCapture) : base(RenderCapture_Alloc(), RenderCapture_Free)
+        {
+            this._baseCapture = baseCapture ?? throw new ArgumentNullException(nameof(baseCapture));
+        }
+
+        public bool Draw(IntPtr surface, bool isNewSurface, ref bool isNewtargetView)
+            => RenderCapture_Render(Pointer, _baseCapture.Pointer, surface, isNewSurface, ref isNewtargetView);
+
+    }
+}
