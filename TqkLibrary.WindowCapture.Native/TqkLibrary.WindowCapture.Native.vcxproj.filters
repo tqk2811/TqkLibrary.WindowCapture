@@ -110,6 +110,9 @@
     <ClCompile Include="InputTextureClass.cpp">
       <Filter>D3D\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="BaseCapture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="VertexShader.hlsl">

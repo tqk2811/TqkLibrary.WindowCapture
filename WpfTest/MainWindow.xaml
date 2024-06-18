@@ -5,13 +5,23 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfTest"
         xmlns:DXExtensions="clr-namespace:TqkLibrary.Wpf.Interop.DirectX;assembly=TqkLibrary.Wpf.Interop.DirectX"
+        xmlns:st="http://schemas.spicytaco.io/"
         mc:Ignorable="d"
         Loaded="Window_Loaded"
         SizeChanged="Window_SizeChanged" Background="Black"
         Title="MainWindow" Height="450" Width="800" WindowStartupLocation="CenterScreen">
-    <Image>
-        <Image.Source>
-            <DXExtensions:D3D11Image x:Name="InteropImage"/>
-        </Image.Source>
-    </Image>
+    <Grid>
+        <st:StackPanel Orientation="Horizontal">
+            <st:StackPanel VerticalAlignment="Top" HorizontalAlignment="Left" Orientation="Vertical">
+                <TextBlock x:Name="tb_drawTime" Background="White" Foreground="Black" Padding="5"/>
+                <TextBlock x:Name="tb_fps" Background="White" Foreground="Black" Padding="5"/>
+            </st:StackPanel>
+            
+            <Image st:StackPanel.Fill="Fill">
+                <Image.Source>
+                    <DXExtensions:D3D11Image x:Name="InteropImage"/>
+                </Image.Source>
+            </Image>
+        </st:StackPanel>
+    </Grid>
 </Window>

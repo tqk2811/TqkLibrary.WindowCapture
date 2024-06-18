@@ -181,6 +181,7 @@
     <ClInclude Include="WinApi.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="BaseCapture.cpp" />
     <ClCompile Include="BitbltCapture.cpp" />
     <ClCompile Include="D3DClass.cpp" />
     <ClCompile Include="InputTextureClass.cpp" />

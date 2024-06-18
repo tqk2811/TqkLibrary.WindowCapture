@@ -29,7 +29,14 @@ namespace TqkLibrary.WindowCapture
             this._baseCapture = baseCapture ?? throw new ArgumentNullException(nameof(baseCapture));
         }
 
-        public bool Draw(IntPtr surface, bool isNewSurface, ref bool isNewtargetView)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="surface"></param>
+        /// <param name="isNewSurface"></param>
+        /// <param name="isNewtargetView">true if source image change size</param>
+        /// <returns></returns>
+        public virtual bool Draw(IntPtr surface, bool isNewSurface, ref bool isNewtargetView)
             => RenderCapture_Render(Pointer, _baseCapture.Pointer, surface, isNewSurface, ref isNewtargetView);
 
     }

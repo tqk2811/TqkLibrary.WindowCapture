@@ -12,6 +12,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using TqkLibrary.WinApi;
+using TqkLibrary.WinApi.FindWindowHelper;
 using TqkLibrary.WindowCapture;
 using TqkLibrary.WindowCapture.Captures;
 using TqkLibrary.Wpf.Interop.DirectX;
@@ -26,54 +27,47 @@ namespace WpfTest
         readonly IEnumerable<string> names = new List<string>()
         {
             "notepad",
-            "maplestory"
+            "chrome",//hardware-accelerated graphics context (OpenGL- or DirectX-based) not work for Bitblt
         };
-        Process? GetProcess()
+        IntPtr GetHandler()
         {
-            Process? process = null;
-            for (int i = 0; i < names.Count() && process is null; i++)
+            for (int i = 0; i < names.Count(); i++)
             {
-                var processs = Process.GetProcessesByName(names.Skip(i).First());
-                process = processs.FirstOrDefault(x => x.MainWindowHandle != IntPtr.Zero);
+                var processHelpers = Process.GetProcessesByName(names.Skip(i).First()).Select(x => new ProcessHelper((uint)x.Id));
+                foreach (ProcessHelper processHelper in processHelpers)
+                {
+                    foreach(WindowHelper windowHelper in processHelper.AllWindows)
+                    {
+                        if(windowHelper.IsWindow && !string.IsNullOrWhiteSpace(windowHelper.Title))
+                        {
+                            return windowHelper.WindowHandle;
+                        }
+                    }
+                }
             }
-            return process;
+            return IntPtr.Zero;
         }
 
 
 
-        bool lastVisible;
-        TimeSpan lastRender;
-
-        readonly IntPtr windowHandle;
-        readonly BaseCapture baseCapture;
-        readonly RenderCapture renderCapture;
+        bool _lastVisible;
+        TimeSpan _lastRender;
+        readonly Stopwatch _stopwatch = new Stopwatch();
+        readonly IntPtr _windowHandle;
+        readonly BaseCapture _baseCapture;
+        readonly RenderCapture _renderCapture;
+        DateTime _dateTime = DateTime.Now;
+        int fpsCount = 0;
         public MainWindow()
         {
-            Process? process = GetProcess();
-            if (process is null) throw new Exception();
+            _windowHandle = GetHandler();
 
-            windowHandle = process.MainWindowHandle;
+            _baseCapture = new BitbltCapture();
 
-            //using Bitmap? bitmap = windowHandle.Capture(TqkLibrary.WinApi.Enums.CaptureType.PrintWindow);
-            //bitmap?.Save("D:\\test.png");
-
-
-
-            baseCapture = new BitbltCapture();
-
-
-            if (!baseCapture.Init(windowHandle))
+            if (!_baseCapture.Init(_windowHandle))
                 throw new Exception();
 
-            renderCapture = new RenderCapture(baseCapture);
-
-            //using Bitmap bitmap = baseCapture.Shoot();
-            //bitmap?.Save("D:\\test.png");
-
-
-
-
-
+            _renderCapture = new RenderCapture(_baseCapture);
 
             InitializeComponent();
         }
@@ -103,10 +97,10 @@ namespace WpfTest
 
             bool isVisible = (surfWidth != 0 && surfHeight != 0);
 
-            if (lastVisible != isVisible)
+            if (_lastVisible != isVisible)
             {
-                lastVisible = isVisible;
-                if (lastVisible)
+                _lastVisible = isVisible;
+                if (_lastVisible)
                 {
                     CompositionTarget.Rendering += CompositionTarget_Rendering;
                 }
@@ -120,17 +114,31 @@ namespace WpfTest
         private void CompositionTarget_Rendering(object? sender, EventArgs e)
         {
             RenderingEventArgs args = (RenderingEventArgs)e;
-            if (this.lastRender != args.RenderingTime)
+            if (this._lastRender != args.RenderingTime)
             {
                 InteropImage.RequestRender();
-                this.lastRender = args.RenderingTime;
+                this._lastRender = args.RenderingTime;
             }
         }
 
         void OnRender(IntPtr surface, bool isNewSurface)
         {
+            if (DateTime.Now - _dateTime >= TimeSpan.FromSeconds(1))
+            {
+                tb_fps.Text = $"{fpsCount:000} fps";
+                _dateTime = DateTime.Now;
+                fpsCount = 0;
+            }
+
+            _stopwatch.Restart();
             bool isNewtargetView = false;
-            renderCapture.Draw(surface, isNewSurface, ref isNewtargetView);
+            if (_renderCapture.Draw(surface, isNewSurface, ref isNewtargetView))
+            {
+                _stopwatch.Stop();
+                fpsCount++;
+                tb_drawTime.Text = $"{_stopwatch.ElapsedMilliseconds:000} ms";
+            }
+
             if (isNewtargetView)
             {
                 _SizeChanged();

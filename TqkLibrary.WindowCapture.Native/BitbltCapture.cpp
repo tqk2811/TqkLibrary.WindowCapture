@@ -1,33 +1,9 @@
 #include "BitbltCapture.hpp"
+#define __CheckBitmap__
 
 BitbltCapture* BitbltCapture_Alloc()
 {
 	return new BitbltCapture();
-}
-VOID BitbltCapture_Free(BitbltCapture** ppBitbltCapture)
-{
-	if (ppBitbltCapture)
-	{
-		BitbltCapture* pBitbltCapture = *ppBitbltCapture;
-		if (pBitbltCapture)
-		{
-			delete pBitbltCapture;
-			*ppBitbltCapture = nullptr;
-		}
-	}
-}
-
-BOOL BitbltCapture_InitCapture(BitbltCapture* pBitbltCapture, HWND hWnd)
-{
-	return pBitbltCapture->InitCapture(hWnd);
-}
-HBITMAP BitbltCapture_Shoot(BitbltCapture* pBitbltCapture)
-{
-	return pBitbltCapture->Shoot();
-}
-BOOL HBITMAP_Release(HBITMAP hbitmap)
-{
-	return DeleteObject(hbitmap);
 }
 
 
@@ -35,18 +11,23 @@ BitbltCapture::BitbltCapture() {
 	d3d = new D3DClass();
 }
 BitbltCapture::~BitbltCapture() {
+	if (_hdc)
+		DeleteDC(_hdc);
+
 	if (d3d)
 		delete d3d;
 }
 
 BOOL BitbltCapture::InitCapture(HWND hWnd) {
 	this->m_hWnd = hWnd;
-	return TRUE;
+
+	this->_hdc = CreateCompatibleDC(NULL);
+
+	return _hdc != 0;
 }
 
 HBITMAP CaptureToHBitmap(HWND hwnd)
 {
-	RECT rcClient;
 	int width;
 	int height;
 
@@ -58,14 +39,30 @@ HBITMAP CaptureToHBitmap(HWND hwnd)
 	HBITMAP hBitmap{ 0 };
 
 
-	if (!GetClientRect(hwnd, &rcClient))
-		goto end;
-	width = rcClient.right - rcClient.left;
-	height = rcClient.bottom - rcClient.top;
-
 	hdcSource = GetDC(hwnd);
 	if (!hdcSource)
 		goto end;
+
+	{
+#ifdef __CheckBitmap__
+		HGDIOBJ srcHbitmap;
+		srcHbitmap = GetCurrentObject(hdcSource, OBJ_BITMAP);
+
+		BITMAP srcBitmapHeader;
+		memset(&srcBitmapHeader, 0, sizeof(BITMAP));
+		GetObject(srcHbitmap, sizeof(BITMAP), &srcBitmapHeader);
+
+		width = srcBitmapHeader.bmWidth;
+		height = srcBitmapHeader.bmHeight;
+#else
+		RECT rcClient;
+		if (!GetClientRect(hwnd, &rcClient))
+			goto end;
+
+		width = rcClient.right - rcClient.left;
+		height = rcClient.bottom - rcClient.top;
+#endif
+	}
 
 	hdcDest = CreateCompatibleDC(hdcSource);
 	if (!hdcDest)
@@ -109,13 +106,11 @@ BOOL BitbltCapture::Draw(ID3D11Device* device, ID3D11DeviceContext* deviceCtx, C
 	HBITMAP hBitmap{};
 	D3D11_MAPPED_SUBRESOURCE map{};
 
-	HDC hdc = CreateCompatibleDC(NULL);
-	if (!hdc)
+	hBitmap = CaptureToHBitmap(this->m_hWnd);
+	if (!hBitmap)
 		goto end;
 
-	hBitmap = CaptureToHBitmap(this->m_hWnd);
-
-	SelectObject(hdc, hBitmap);
+	SelectObject(this->_hdc, hBitmap);
 	GetObject(hBitmap, sizeof(BITMAP), &bitmap);
 
 	bi.biSize = sizeof(BITMAPINFOHEADER);
@@ -133,10 +128,10 @@ BOOL BitbltCapture::Draw(ID3D11Device* device, ID3D11DeviceContext* deviceCtx, C
 	dwBmpSize = ((bitmap.bmWidth * 32 /*+ 31*/) / 32) * 4 * bitmap.bmHeight;
 	pData = new BYTE[dwBmpSize];
 
-	res = GetDIBits(hdc, hBitmap, 0,
+	res = GetDIBits(this->_hdc, hBitmap, 0,
 		(UINT)bitmap.bmHeight,
 		pData,
-		(BITMAPINFO*)&bi, 
+		(BITMAPINFO*)&bi,
 		DIB_RGB_COLORS);
 
 	{
@@ -161,18 +156,15 @@ BOOL BitbltCapture::Draw(ID3D11Device* device, ID3D11DeviceContext* deviceCtx, C
 	if (FAILED(hr))
 		goto end;
 
-	if (map.DepthPitch == dwBmpSize)
-	{
-		memcpy(map.pData, pData, dwBmpSize);
-	}
-	else
 	{
 		UINT64 bitmapLineSize = 4 * bitmap.bmWidth;
 		INT32 sizeCopy = min(bitmapLineSize, map.RowPitch);
+
+		//bit map flipped Y-axis
 		for (int i = 0; i < bitmap.bmHeight; i++)
 		{
 			memcpy(
-				(void*)((UINT64)map.pData + (UINT64)(map.RowPitch * (bitmap.bmHeight - 1 - i))),//bit map got flipped?
+				(void*)((UINT64)map.pData + (UINT64)(map.RowPitch * (bitmap.bmHeight - 1 - i))),
 				(void*)((UINT64)pData + (UINT64)(bitmapLineSize * i)),
 				sizeCopy
 			);
@@ -184,8 +176,6 @@ BOOL BitbltCapture::Draw(ID3D11Device* device, ID3D11DeviceContext* deviceCtx, C
 end:
 	if (pData)
 		delete[] pData;
-	if (hdc)
-		DeleteDC(hdc);
 	if (hBitmap)
 		DeleteObject(hBitmap);
 
@@ -195,4 +185,9 @@ end:
 HBITMAP BitbltCapture::Shoot()
 {
 	return CaptureToHBitmap(this->m_hWnd);
+}
+
+BOOL BitbltCapture::GetSize(UINT32& width, UINT32& height)
+{
+	return FALSE;
 }
