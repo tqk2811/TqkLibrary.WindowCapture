@@ -170,6 +170,7 @@
     <ClInclude Include="BaseCapture.hpp" />
     <ClInclude Include="BitbltCapture.hpp" />
     <ClInclude Include="D3DClass.hpp" />
+    <ClInclude Include="DesktopDuplicationCapture.hpp" />
     <ClInclude Include="Directx.hpp" />
     <ClInclude Include="Exports.hpp" />
     <ClInclude Include="Gdi.hpp" />
@@ -184,6 +185,7 @@
     <ClCompile Include="BaseCapture.cpp" />
     <ClCompile Include="BitbltCapture.cpp" />
     <ClCompile Include="D3DClass.cpp" />
+    <ClCompile Include="DesktopDuplicationCapture.cpp" />
     <ClCompile Include="InputTextureClass.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

@@ -12,6 +12,10 @@ public:
 	virtual BOOL Draw(ID3D11Device* device, ID3D11DeviceContext* deviceCtx, ComPtr<ID3D11Texture2D>& texture) = 0;
 	virtual HBITMAP Shoot() = 0;
 	virtual BOOL GetSize(UINT32& width, UINT32& height) = 0;
+
+protected:
+	HWND m_hWnd{ 0 };
+
 };
 
 

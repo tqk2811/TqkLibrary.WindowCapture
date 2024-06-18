@@ -158,7 +158,7 @@ BOOL BitbltCapture::Draw(ID3D11Device* device, ID3D11DeviceContext* deviceCtx, C
 
 	{
 		UINT64 bitmapLineSize = 4 * bitmap.bmWidth;
-		INT32 sizeCopy = min(bitmapLineSize, map.RowPitch);
+		UINT64 sizeCopy = min(bitmapLineSize, map.RowPitch);
 
 		//bit map flipped Y-axis
 		for (int i = 0; i < bitmap.bmHeight; i++)

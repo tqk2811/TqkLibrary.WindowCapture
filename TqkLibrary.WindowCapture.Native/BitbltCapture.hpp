@@ -17,7 +17,6 @@ public:
 	BOOL GetSize(UINT32& width, UINT32& height);
 
 private:
-	HWND m_hWnd{ 0 };
 	HDC _hdc{ 0 };
 
 	D3DClass* d3d{ nullptr };

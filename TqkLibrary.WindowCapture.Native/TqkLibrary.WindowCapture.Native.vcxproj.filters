@@ -25,12 +25,6 @@
     <Filter Include="DesktopDuplication">
       <UniqueIdentifier>{7bd1da31-10d6-4b9e-85e4-9ac3c092f202}</UniqueIdentifier>
     </Filter>
-    <Filter Include="DesktopDuplication\Header Files">
-      <UniqueIdentifier>{2a278ec6-ecbf-4940-9496-be99da7dd645}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="DesktopDuplication\Source Files">
-      <UniqueIdentifier>{86868769-8731-49ae-adfb-0d4f2fa92d0a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Bitblt">
       <UniqueIdentifier>{1cfa800e-f1a4-4b7b-acc3-4571e0902812}</UniqueIdentifier>
     </Filter>
@@ -84,6 +78,9 @@
     <ClInclude Include="InputTextureClass.hpp">
       <Filter>D3D\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DesktopDuplicationCapture.hpp">
+      <Filter>DesktopDuplication</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -112,6 +109,9 @@
     </ClCompile>
     <ClCompile Include="BaseCapture.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DesktopDuplicationCapture.cpp">
+      <Filter>DesktopDuplication</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
