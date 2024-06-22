@@ -48,17 +48,21 @@ namespace TqkLibrary.WindowCapture
         public virtual bool Init(IntPtr captureHandler)
             => BaseCapture_InitCapture(Pointer, captureHandler);
 
-        public virtual Bitmap Shoot()
+        public virtual Bitmap? Shoot()
         {
             IntPtr hBitmap = BaseCapture_Shoot(Pointer);
-            try
+            if(hBitmap != IntPtr.Zero)
             {
-                return Bitmap.FromHbitmap(hBitmap);
+                try
+                {
+                    return Bitmap.FromHbitmap(hBitmap);
+                }
+                finally
+                {
+                    HBITMAP_Release(hBitmap);
+                }
             }
-            finally
-            {
-                HBITMAP_Release(hBitmap);
-            }
+            return null;
         }
 
     }

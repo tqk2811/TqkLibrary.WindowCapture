@@ -13,21 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Win10_1903">
-      <UniqueIdentifier>{8dba567a-5be2-405f-9804-2f1f3a00f3c4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Win10_1903\Header Files">
-      <UniqueIdentifier>{26f0c4ce-617d-4529-97c2-46810609ccf3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Win10_1903\Source Files">
-      <UniqueIdentifier>{37295491-60ea-4ac7-8326-5b7dc9f48de3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="DesktopDuplication">
-      <UniqueIdentifier>{7bd1da31-10d6-4b9e-85e4-9ac3c092f202}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Bitblt">
-      <UniqueIdentifier>{1cfa800e-f1a4-4b7b-acc3-4571e0902812}</UniqueIdentifier>
-    </Filter>
     <Filter Include="D3D">
       <UniqueIdentifier>{f812c001-de79-4040-9859-d660ac52d748}</UniqueIdentifier>
     </Filter>
@@ -39,6 +24,30 @@
     </Filter>
     <Filter Include="D3D\Resource Files">
       <UniqueIdentifier>{e9b9e7a4-115a-4a8a-8d60-6190e38ad00e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Captures">
+      <UniqueIdentifier>{909993da-b69a-4ddf-8259-b94ae828f8f8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Captures\Win10_1903">
+      <UniqueIdentifier>{8dba567a-5be2-405f-9804-2f1f3a00f3c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Captures\Win10_1903\Header Files">
+      <UniqueIdentifier>{26f0c4ce-617d-4529-97c2-46810609ccf3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Captures\Win10_1903\Source Files">
+      <UniqueIdentifier>{37295491-60ea-4ac7-8326-5b7dc9f48de3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Captures\DesktopDuplication">
+      <UniqueIdentifier>{7bd1da31-10d6-4b9e-85e4-9ac3c092f202}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Captures\Hdc">
+      <UniqueIdentifier>{4d308e42-e1a3-4523-ac52-f201231964d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Captures\Hdc\Bitblt">
+      <UniqueIdentifier>{1cfa800e-f1a4-4b7b-acc3-4571e0902812}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Captures\Hdc\PrintWindow">
+      <UniqueIdentifier>{8c421acb-aa1a-425f-b51d-25b9204845fd}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -70,7 +79,7 @@
       <Filter>D3D</Filter>
     </ClInclude>
     <ClInclude Include="BitbltCapture.hpp">
-      <Filter>Bitblt</Filter>
+      <Filter>Captures\Hdc\Bitblt</Filter>
     </ClInclude>
     <ClInclude Include="BaseCapture.hpp">
       <Filter>Header Files</Filter>
@@ -79,7 +88,13 @@
       <Filter>D3D\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DesktopDuplicationCapture.hpp">
-      <Filter>DesktopDuplication</Filter>
+      <Filter>Captures\DesktopDuplication</Filter>
+    </ClInclude>
+    <ClInclude Include="PrintWindowCapture.hpp">
+      <Filter>Captures\Hdc\PrintWindow</Filter>
+    </ClInclude>
+    <ClInclude Include="HdcHelper.hpp">
+      <Filter>Captures\Hdc</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -102,7 +117,7 @@
       <Filter>D3D</Filter>
     </ClCompile>
     <ClCompile Include="BitbltCapture.cpp">
-      <Filter>Bitblt</Filter>
+      <Filter>Captures\Hdc\Bitblt</Filter>
     </ClCompile>
     <ClCompile Include="InputTextureClass.cpp">
       <Filter>D3D\Source Files</Filter>
@@ -111,7 +126,13 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DesktopDuplicationCapture.cpp">
-      <Filter>DesktopDuplication</Filter>
+      <Filter>Captures\DesktopDuplication</Filter>
+    </ClCompile>
+    <ClCompile Include="PrintWindowCapture.cpp">
+      <Filter>Captures\Hdc\PrintWindow</Filter>
+    </ClCompile>
+    <ClCompile Include="HdcHelper.cpp">
+      <Filter>Captures\Hdc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

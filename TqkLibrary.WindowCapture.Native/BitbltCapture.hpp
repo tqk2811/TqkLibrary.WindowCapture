@@ -18,8 +18,6 @@ public:
 
 private:
 	HDC _hdc{ 0 };
-
-	D3DClass* d3d{ nullptr };
 };
 
 TqkLibrary_WindowCapture_Export BitbltCapture* BitbltCapture_Alloc();

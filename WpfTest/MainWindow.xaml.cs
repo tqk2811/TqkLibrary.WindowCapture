@@ -36,9 +36,9 @@ namespace WpfTest
                 var processHelpers = Process.GetProcessesByName(names.Skip(i).First()).Select(x => new ProcessHelper((uint)x.Id));
                 foreach (ProcessHelper processHelper in processHelpers)
                 {
-                    foreach(WindowHelper windowHelper in processHelper.AllWindows)
+                    foreach (WindowHelper windowHelper in processHelper.AllWindows)
                     {
-                        if(windowHelper.IsWindow && !string.IsNullOrWhiteSpace(windowHelper.Title))
+                        if (windowHelper.IsWindow && !string.IsNullOrWhiteSpace(windowHelper.Title))
                         {
                             return windowHelper.WindowHandle;
                         }
@@ -49,20 +49,26 @@ namespace WpfTest
         }
 
 
-
-        bool _lastVisible;
-        TimeSpan _lastRender;
         readonly Stopwatch _stopwatch = new Stopwatch();
         readonly IntPtr _windowHandle;
         readonly BaseCapture _baseCapture;
         readonly RenderCapture _renderCapture;
+
+
+        bool _lastVisible;
+        TimeSpan _lastRender;
         DateTime _dateTime = DateTime.Now;
         int fpsCount = 0;
+        double rateVideoAndDraw;
+
+
         public MainWindow()
         {
             _windowHandle = GetHandler();
 
             _baseCapture = new BitbltCapture();
+            //_baseCapture = new PrintWindowCapture();
+
 
             if (!_baseCapture.Init(_windowHandle))
                 throw new Exception();
@@ -90,10 +96,20 @@ namespace WpfTest
         {
             double dpiScale = 1.0;
 
-            int surfWidth = (int)(this.ActualWidth < 0 ? 0 : Math.Ceiling(this.ActualWidth * dpiScale));
-            int surfHeight = (int)(this.ActualHeight < 0 ? 0 : Math.Ceiling(this.ActualHeight * dpiScale));
+            double surfWidth = this.ActualWidth < 0 ? 0 : Math.Ceiling(this.ActualWidth * dpiScale);
+            double surfHeight = this.ActualHeight < 0 ? 0 : Math.Ceiling(this.ActualHeight * dpiScale);
 
-            InteropImage.SetPixelSize(surfWidth, surfHeight);
+            System.Drawing.Size videoSize = _baseCapture.Size;
+            if (!videoSize.IsEmpty && surfWidth != 0 && surfHeight != 0)
+            {
+                //recalc surfWidth, surfHeight
+
+                rateVideoAndDraw = Math.Min(surfWidth / videoSize.Width, surfHeight / videoSize.Height);
+                surfWidth = videoSize.Width * rateVideoAndDraw;
+                surfHeight = videoSize.Height * rateVideoAndDraw;
+            }
+
+            InteropImage.SetPixelSize((int)surfWidth, (int)surfHeight);
 
             bool isVisible = (surfWidth != 0 && surfHeight != 0);
 

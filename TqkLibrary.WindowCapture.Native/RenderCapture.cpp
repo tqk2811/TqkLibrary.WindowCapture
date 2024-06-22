@@ -71,26 +71,30 @@ BOOL RenderCapture::Render(BaseCapture* baseCapture, IUnknown* surface, bool isN
 		return FALSE;
 
 	ComPtr<ID3D11Texture2D> texture;
-	result = baseCapture->Draw(device.Get(), deviceCtx.Get(), texture);
-	if (!result)
-		return FALSE;
-	D3D11_TEXTURE2D_DESC desc;
-	texture->GetDesc(&desc);
+	BOOL isNewTexture = baseCapture->Draw(device.Get(), deviceCtx.Get(), texture);
+	if (isNewTexture)
+	{
+		D3D11_TEXTURE2D_DESC desc;
+		texture->GetDesc(&desc);
+		result = this->_inputTexture.Initialize(device.Get(), desc.Width, desc.Height);
+		if (!result)
+			return FALSE;
 
-	result = this->_inputTexture.Initialize(device.Get(), desc.Width, desc.Height);
-	if (!result)
-		return FALSE;
-	result = this->_inputTexture.Copy(deviceCtx.Get(), texture.Get());
-	if (!result)
-		return FALSE;
+		result = this->_inputTexture.Copy(deviceCtx.Get(), texture.Get());
+		if (!result)
+			return FALSE;
+	}
 
-	deviceCtx->ClearState();
-	deviceCtx->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	this->_vertexShader.Set(deviceCtx.Get());
-	this->_pixelShader.Set(deviceCtx.Get(), _inputTexture.GetView());//////////////////
-	this->_renderSurface.SetRenderTarget(deviceCtx.Get(), nullptr);
-	this->_renderSurface.SetViewPort(deviceCtx.Get(), this->_renderSurface.Width(), this->_renderSurface.Height());
-	deviceCtx->Draw(this->_vertexShader.GetVertexCount(), 0);
+	if (isNewtargetView || isNewSurface || isNewTexture)
+	{
+		deviceCtx->ClearState();
+		deviceCtx->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		this->_vertexShader.Set(deviceCtx.Get());
+		this->_pixelShader.Set(deviceCtx.Get(), _inputTexture.GetView());//////////////////
+		this->_renderSurface.SetRenderTarget(deviceCtx.Get(), nullptr);
+		this->_renderSurface.SetViewPort(deviceCtx.Get(), this->_renderSurface.Width(), this->_renderSurface.Height());
+		deviceCtx->Draw(this->_vertexShader.GetVertexCount(), 0);
+	}
 
 	return result;
 }
