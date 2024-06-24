@@ -176,10 +176,12 @@
     <ClInclude Include="Gdi.hpp" />
     <ClInclude Include="HdcHelper.hpp" />
     <ClInclude Include="InputTextureClass.hpp" />
+    <ClInclude Include="Md5Helper.hpp" />
     <ClInclude Include="PixelShaderClass.hpp" />
     <ClInclude Include="PrintWindowCapture.hpp" />
     <ClInclude Include="RenderCapture.hpp" />
     <ClInclude Include="RenderTextureSurfaceClass.hpp" />
+    <ClInclude Include="Utils.hpp" />
     <ClInclude Include="VertexShaderClass.hpp" />
     <ClInclude Include="WinApi.hpp" />
   </ItemGroup>
@@ -190,6 +192,7 @@
     <ClCompile Include="DesktopDuplicationCapture.cpp" />
     <ClCompile Include="HdcHelper.cpp" />
     <ClCompile Include="InputTextureClass.cpp" />
+    <ClCompile Include="Md5Helper.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -200,6 +203,7 @@
     <ClCompile Include="PrintWindowCapture.cpp" />
     <ClCompile Include="RenderCapture.cpp" />
     <ClCompile Include="RenderTextureSurfaceClass.cpp" />
+    <ClCompile Include="Utils.cpp" />
     <ClCompile Include="VertexShaderClass.cpp" />
   </ItemGroup>
   <ItemGroup>

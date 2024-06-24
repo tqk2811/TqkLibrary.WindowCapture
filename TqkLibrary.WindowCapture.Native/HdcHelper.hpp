@@ -4,6 +4,8 @@
 #include "WinApi.hpp"
 #include "Directx.hpp"
 #include "Gdi.hpp"
+#include "Md5Helper.hpp"
+
 enum Hdc_Capture_Mode
 {
 	Hdc_Capture_Mode_BitBlt,
@@ -18,6 +20,9 @@ BOOL HDC_CopyBitmapToTexture(
 	const HDC hdc,
 	ID3D11Device* device,
 	ID3D11DeviceContext* deviceCtx,
-	ComPtr<ID3D11Texture2D>& texture
+	ComPtr<ID3D11Texture2D>& texture,
+	Md5Helper* pMd5Helper,
+	BYTE* hash = nullptr,
+	const BYTE const* oldHash = nullptr
 );
 #endif

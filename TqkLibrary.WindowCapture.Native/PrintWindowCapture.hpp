@@ -2,6 +2,8 @@
 #define _WindowCapture_H_DesktopDuplicationCapture_H_
 
 #include "BaseCapture.hpp"
+#include "Utils.hpp"
+
 class PrintWindowCapture : public BaseCapture
 {
 public:

@@ -1,4 +1,5 @@
 #include "HdcHelper.hpp"
+#include "Utils.hpp"
 #define __CheckBitmap__
 
 BOOL HDC_GetSize(const HWND hwnd, UINT32& width, UINT32& height)
@@ -131,12 +132,15 @@ BOOL HDC_CopyBitmapToTexture(
 	const HDC hdc,
 	ID3D11Device* device,
 	ID3D11DeviceContext* deviceCtx,
-	ComPtr<ID3D11Texture2D>& texture
+	ComPtr<ID3D11Texture2D>& texture,
+	Md5Helper* pMd5Helper,
+	BYTE* hash,
+	const BYTE const* oldHash
 )
 {
 	if (!hBitmap || hBitmap == INVALID_HANDLE_VALUE ||
 		!hdc || hdc == INVALID_HANDLE_VALUE ||
-		!device || 
+		!device ||
 		!deviceCtx)
 		return FALSE;
 
@@ -144,7 +148,6 @@ BOOL HDC_CopyBitmapToTexture(
 
 	BITMAPINFOHEADER bi{ };
 	DWORD dwBmpSize = 0;
-	int res = 0;
 	HRESULT hr{};
 	BITMAP bitmap{};
 	D3D11_MAPPED_SUBRESOURCE map{};
@@ -152,8 +155,17 @@ BOOL HDC_CopyBitmapToTexture(
 	//release
 	void* pData{ nullptr };
 
-	SelectObject(hdc, hBitmap);
-	GetObject(hBitmap, sizeof(BITMAP), &bitmap);
+	{
+		HGDIOBJ obj = SelectObject(hdc, hBitmap);
+		result = obj != NULL;
+		if (!result)
+			goto end;
+	}
+
+	result = GetObject(hBitmap, sizeof(BITMAP), &bitmap) == sizeof(BITMAP);
+	if (!result)
+		goto end;
+
 
 	bi.biSize = sizeof(BITMAPINFOHEADER);
 	bi.biWidth = bitmap.bmWidth;
@@ -170,11 +182,25 @@ BOOL HDC_CopyBitmapToTexture(
 	dwBmpSize = ((bitmap.bmWidth * 32 /*+ 31*/) / 32) * 4 * bitmap.bmHeight;
 	pData = new BYTE[dwBmpSize];
 
-	res = GetDIBits(hdc, hBitmap, 0,
+	result = GetDIBits(hdc, hBitmap, 0,
 		(UINT)bitmap.bmHeight,
 		pData,
 		(BITMAPINFO*)&bi,
-		DIB_RGB_COLORS);
+		DIB_RGB_COLORS) == bitmap.bmHeight;
+	if (!result)
+		goto end;
+
+	if (pMd5Helper && hash && oldHash)
+	{
+		result = pMd5Helper->CalcHash((const BYTE const*)pData, dwBmpSize, hash, Md5HashSize) == Md5HashSize;
+		if (!result)
+			goto end;
+
+		result = memcmp(hash, oldHash, Md5HashSize) != 0;//same hash => no new image
+		if (!result)
+			goto end;
+	}
+
 
 	{
 		D3D11_TEXTURE2D_DESC texDesc;

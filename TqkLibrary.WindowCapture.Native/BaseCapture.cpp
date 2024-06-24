@@ -37,3 +37,16 @@ BOOL HBITMAP_Release(HBITMAP hbitmap)
 {
 	return DeleteObject(hbitmap);
 }
+
+BaseCapture::BaseCapture() 
+{
+	ZeroMemory(this->m_hash, Md5HashSize);
+	this->m_md5Helper = new Md5Helper();
+}
+
+BaseCapture::~BaseCapture()
+{
+	if (this->m_md5Helper)
+		delete this->m_md5Helper;
+	this->m_md5Helper = nullptr;
+}

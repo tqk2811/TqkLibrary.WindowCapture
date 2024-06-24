@@ -96,6 +96,12 @@
     <ClInclude Include="HdcHelper.hpp">
       <Filter>Captures\Hdc</Filter>
     </ClInclude>
+    <ClInclude Include="Utils.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Md5Helper.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -133,6 +139,12 @@
     </ClCompile>
     <ClCompile Include="HdcHelper.cpp">
       <Filter>Captures\Hdc</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Md5Helper.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -4,10 +4,12 @@
 #include "Directx.hpp"
 #include "D3DClass.hpp"
 #include "Exports.hpp"
-
+#include "Md5Helper.hpp"
 class BaseCapture
 {
 public:
+	BaseCapture();
+	~BaseCapture();
 	virtual BOOL InitCapture(HWND hWnd) = 0;
 	virtual BOOL Draw(ID3D11Device* device, ID3D11DeviceContext* deviceCtx, ComPtr<ID3D11Texture2D>& texture) = 0;
 	virtual HBITMAP Shoot() = 0;
@@ -16,6 +18,8 @@ public:
 protected:
 	HWND m_hWnd{ 0 };
 
+	Md5Helper* m_md5Helper;
+	BYTE m_hash[Md5HashSize];
 };
 
 

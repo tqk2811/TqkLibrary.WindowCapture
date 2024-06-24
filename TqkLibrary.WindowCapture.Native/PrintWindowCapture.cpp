@@ -9,23 +9,24 @@ PrintWindowCapture* PrintWindow_Alloc()
 
 PrintWindowCapture::PrintWindowCapture()
 {
-
+	this->_hdc = CreateCompatibleDC(NULL);
+	assert(this->_hdc);
 }
 PrintWindowCapture::~PrintWindowCapture()
 {
 	if (_hdc)
 		DeleteDC(_hdc);
+	_hdc = NULL;
 }
 
 BOOL PrintWindowCapture::InitCapture(HWND hWnd)
 {
+	if (!this->_hdc)
+		return FALSE;
+
 	if (!hWnd || hWnd == INVALID_HANDLE_VALUE)
 		return FALSE;
 	this->m_hWnd = hWnd;
-
-	this->_hdc = CreateCompatibleDC(NULL);
-	if (!this->_hdc)
-		return FALSE;
 
 	return TRUE;
 }
@@ -38,7 +39,10 @@ BOOL PrintWindowCapture::Draw(ID3D11Device* device, ID3D11DeviceContext* deviceC
 	if (!hBitmap || hBitmap == INVALID_HANDLE_VALUE)
 		return FALSE;
 
-	BOOL result = HDC_CopyBitmapToTexture(hBitmap, this->_hdc, device, deviceCtx, texture);
+	BYTE currentHash[Md5HashSize];
+	BOOL result = HDC_CopyBitmapToTexture(hBitmap, this->_hdc, device, deviceCtx, texture, m_md5Helper, currentHash, this->m_hash);
+	if (result)
+		memcpy(this->m_hash, currentHash, Md5HashSize);
 
 	DeleteObject(hBitmap);
 

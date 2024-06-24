@@ -3,6 +3,7 @@
 
 #include "BaseCapture.hpp"
 #include "Gdi.hpp"
+#include "Utils.hpp"
 
 class BitbltCapture : public BaseCapture
 {
