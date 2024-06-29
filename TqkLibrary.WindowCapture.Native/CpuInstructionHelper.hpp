@@ -103,7 +103,7 @@ static CIH_Info& operator| (const CIH_Info left, const CIH_Info right)
 
 
 void CpuInstructionHelper_Init();
-BOOL CpuInstructionHelper_IsSupport_FeatureInformation(CIH_Info& FEATURES);
-BOOL CpuInstructionHelper_IsSupport_ExtendedFeatureBit(CIH_Info& EX_FEATURES);
-BOOL CpuInstructionHelper_IsSupport_ExtendedExtendedProcessorInfoAndFeatureBit(CIH_Info& EX_PROCESSOR_INFO_AND_FEATURES_BIT);
+BOOL CpuInstructionHelper_IsSupport_FeatureInformation(CIH_Info FEATURES);
+BOOL CpuInstructionHelper_IsSupport_ExtendedFeatureBit(CIH_Info EX_FEATURES);
+BOOL CpuInstructionHelper_IsSupport_ExtendedExtendedProcessorInfoAndFeatureBit(CIH_Info EX_PROCESSOR_INFO_AND_FEATURES_BIT);
 #endif // !_H_CpuInstructionHelper_H_

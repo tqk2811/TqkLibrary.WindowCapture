@@ -1,4 +1,5 @@
 ﻿#include "InputTextureClass.hpp"
+#include "CpuInstructionHelper.hpp"
 extern "C" {
 	void planar_to_interleave
 	(
@@ -13,7 +14,7 @@ extern "C" {
 		int i;
 
 #ifdef __AVX2__
-		if (HW_AVX2 && uv_size % 32 == 0)
+		if (CpuInstructionHelper_IsSupport_ExtendedFeatureBit(CIH_EX_FEATURES_AVX2) && uv_size % 32 == 0)
 		{
 			for (i = 0; i < u_size; i += 16)//16 byte step
 			{

@@ -49,15 +49,15 @@ BOOL CheckFlag(CIH_Info& info, CIH_Info& check)
 }
 
 
-BOOL CpuInstructionHelper_IsSupport_FeatureInformation(CIH_Info& check)
+BOOL CpuInstructionHelper_IsSupport_FeatureInformation(CIH_Info check)
 {
 	return CheckFlag(CIH_FeatureInformation, check);
 }
-BOOL CpuInstructionHelper_IsSupport_ExtendedFeatureBit(CIH_Info& check)
+BOOL CpuInstructionHelper_IsSupport_ExtendedFeatureBit(CIH_Info check)
 {
 	return CheckFlag(CIH_ExtendedFeatureBit, check);
 }
-BOOL CpuInstructionHelper_IsSupport_ExtendedExtendedProcessorInfoAndFeatureBit(CIH_Info& check)
+BOOL CpuInstructionHelper_IsSupport_ExtendedExtendedProcessorInfoAndFeatureBit(CIH_Info check)
 {
 	return CheckFlag(CIH_ExtendedExtendedProcessorInfoAndFeatureBit, check);
 }
