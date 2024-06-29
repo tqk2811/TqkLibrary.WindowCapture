@@ -1,7 +1,7 @@
-#include "Md5Helper.hpp"
+#include "HashHelper.hpp"
 
 
-Md5Helper::Md5Helper()
+HashHelper::HashHelper()
 {
 	BOOL result = CryptAcquireContext(&this->_hProv, NULL, NULL, PROV_RSA_AES, CRYPT_VERIFYCONTEXT);
 	assert(result);
@@ -9,7 +9,7 @@ Md5Helper::Md5Helper()
 	result = CryptCreateHash(_hProv, CALG_MD5, 0, 0, &this->_hMd5Hash);
 	assert(result);
 }
-Md5Helper::~Md5Helper()
+HashHelper::~HashHelper()
 {
 	if (this->_hMd5Hash)
 		CryptDestroyHash(this->_hMd5Hash);
@@ -19,7 +19,7 @@ Md5Helper::~Md5Helper()
 	this->_hProv = NULL;
 }
 
-INT32 Md5Helper::CalcHash(const BYTE const* data, const UINT32 dataSize, BYTE* hash, INT32 hashSize)
+INT32 HashHelper::CalcHash(const BYTE const* data, const UINT32 dataSize, BYTE* hash, INT32 hashSize)
 {
 	INT32 size = -1;
 	BOOL result = FALSE;

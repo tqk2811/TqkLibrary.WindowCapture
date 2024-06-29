@@ -40,13 +40,17 @@ BOOL HBITMAP_Release(HBITMAP hbitmap)
 
 BaseCapture::BaseCapture() 
 {
-	ZeroMemory(this->m_hash, Md5HashSize);
-	this->m_md5Helper = new Md5Helper();
+#ifdef HashHelper_HashSize
+	ZeroMemory(this->m_hash, HashHelper_HashSize);
+	this->m_HashHelper = new HashHelper();
+#endif // HashHelper_HashSize
 }
 
 BaseCapture::~BaseCapture()
 {
-	if (this->m_md5Helper)
-		delete this->m_md5Helper;
-	this->m_md5Helper = nullptr;
+#ifdef HashHelper_HashSize
+	if (this->m_HashHelper)
+		delete this->m_HashHelper;
+	this->m_HashHelper = nullptr;
+#endif // HashHelper_HashSize
 }

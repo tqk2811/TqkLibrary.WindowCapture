@@ -132,10 +132,11 @@ BOOL HDC_CopyBitmapToTexture(
 	const HDC hdc,
 	ID3D11Device* device,
 	ID3D11DeviceContext* deviceCtx,
-	ComPtr<ID3D11Texture2D>& texture,
-	Md5Helper* pMd5Helper,
-	BYTE* hash,
-	const BYTE const* oldHash
+	ComPtr<ID3D11Texture2D>& texture
+#ifdef HashHelper_HashSize
+	,HashHelper* pHashHelper,
+	BYTE* oldHash
+#endif
 )
 {
 	if (!hBitmap || hBitmap == INVALID_HANDLE_VALUE ||
@@ -190,17 +191,25 @@ BOOL HDC_CopyBitmapToTexture(
 	if (!result)
 		goto end;
 
-	if (pMd5Helper && hash && oldHash)
+#ifdef HashHelper_HashSize
+	if (pHashHelper && oldHash)
 	{
-		result = pMd5Helper->CalcHash((const BYTE const*)pData, dwBmpSize, hash, Md5HashSize) == Md5HashSize;
+		BYTE currentHash[HashHelper_HashSize];
+		result = pHashHelper->CalcHash((const BYTE const*)pData, dwBmpSize, currentHash, HashHelper_HashSize) == HashHelper_HashSize;
 		if (!result)
 			goto end;
 
-		result = memcmp(hash, oldHash, Md5HashSize) != 0;//same hash => no new image
-		if (!result)
+		result = memcmp(currentHash, oldHash, HashHelper_HashSize) != 0;//same hash => no new image
+		if (result)
+		{
+			memcpy(oldHash, currentHash, HashHelper_HashSize);
+		}
+		else
+		{
 			goto end;
+		}
 	}
-
+#endif // #ifdef HashHelper_HashSize
 
 	{
 		D3D11_TEXTURE2D_DESC texDesc;

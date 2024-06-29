@@ -1,15 +1,15 @@
-#ifndef _WindowCapture_H_Md5_H_
-#define _WindowCapture_H_Md5_H_
+#ifndef _WindowCapture_H_HashHelper_H_
+#define _WindowCapture_H_HashHelper_H_
 
 #include "WinApi.hpp"
 #include <wincrypt.h>
-#define Md5HashSize 16
+//#define HashHelper_HashSize 16
 
-class Md5Helper
+class HashHelper
 {
 public:
-	Md5Helper();
-	~Md5Helper();
+	HashHelper();
+	~HashHelper();
 
 	INT32 CalcHash(const BYTE const* data, const UINT32 dataSize, BYTE* hash, INT32 hashSize);
 

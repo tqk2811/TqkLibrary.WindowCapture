@@ -4,7 +4,7 @@
 #include "Directx.hpp"
 #include "D3DClass.hpp"
 #include "Exports.hpp"
-#include "Md5Helper.hpp"
+#include "HashHelper.hpp"
 class BaseCapture
 {
 public:
@@ -18,8 +18,11 @@ public:
 protected:
 	HWND m_hWnd{ 0 };
 
-	Md5Helper* m_md5Helper;
-	BYTE m_hash[Md5HashSize];
+#ifdef HashHelper_HashSize
+	HashHelper* m_HashHelper;
+	BYTE m_hash[HashHelper_HashSize];
+#endif
+
 };
 
 
