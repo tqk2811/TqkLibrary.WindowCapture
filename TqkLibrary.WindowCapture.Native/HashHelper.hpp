@@ -2,8 +2,8 @@
 #define _WindowCapture_H_HashHelper_H_
 
 #include "WinApi.hpp"
-#include <wincrypt.h>
-//#define HashHelper_HashSize 16
+#define HashHelper_Enable
+#define HashHelper_HashSize 8
 
 class HashHelper
 {
@@ -14,8 +14,6 @@ public:
 	INT32 CalcHash(const BYTE const* data, const UINT32 dataSize, BYTE* hash, INT32 hashSize);
 
 private:
-	HCRYPTPROV _hProv{ NULL };
-	HCRYPTPROV _hMd5Hash{ NULL };
 };
 
 #endif

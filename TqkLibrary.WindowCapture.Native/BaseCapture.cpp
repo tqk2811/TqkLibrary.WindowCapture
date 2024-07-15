@@ -40,7 +40,7 @@ BOOL HBITMAP_Release(HBITMAP hbitmap)
 
 BaseCapture::BaseCapture() 
 {
-#ifdef HashHelper_HashSize
+#ifdef HashHelper_Enable
 	ZeroMemory(this->m_hash, HashHelper_HashSize);
 	this->m_HashHelper = new HashHelper();
 #endif // HashHelper_HashSize
@@ -48,7 +48,7 @@ BaseCapture::BaseCapture()
 
 BaseCapture::~BaseCapture()
 {
-#ifdef HashHelper_HashSize
+#ifdef HashHelper_Enable
 	if (this->m_HashHelper)
 		delete this->m_HashHelper;
 	this->m_HashHelper = nullptr;

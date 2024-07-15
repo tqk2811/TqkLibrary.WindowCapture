@@ -133,7 +133,7 @@ BOOL HDC_CopyBitmapToTexture(
 	ID3D11Device* device,
 	ID3D11DeviceContext* deviceCtx,
 	ComPtr<ID3D11Texture2D>& texture
-#ifdef HashHelper_HashSize
+#ifdef HashHelper_Enable
 	,HashHelper* pHashHelper,
 	BYTE* oldHash
 #endif
@@ -191,7 +191,7 @@ BOOL HDC_CopyBitmapToTexture(
 	if (!result)
 		goto end;
 
-#ifdef HashHelper_HashSize
+#ifdef HashHelper_Enable
 	if (pHashHelper && oldHash)
 	{
 		BYTE currentHash[HashHelper_HashSize];

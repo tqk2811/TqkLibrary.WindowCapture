@@ -40,7 +40,7 @@ BOOL PrintWindowCapture::Draw(ID3D11Device* device, ID3D11DeviceContext* deviceC
 		return FALSE;
 
 	BOOL result = HDC_CopyBitmapToTexture(hBitmap, this->_hdc, device, deviceCtx, texture
-#ifdef HashHelper_HashSize
+#ifdef HashHelper_Enable
 		, m_HashHelper, this->m_hash
 #endif
 	);

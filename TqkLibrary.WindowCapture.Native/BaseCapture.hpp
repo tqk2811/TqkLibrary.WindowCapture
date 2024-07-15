@@ -18,7 +18,7 @@ public:
 protected:
 	HWND m_hWnd{ 0 };
 
-#ifdef HashHelper_HashSize
+#ifdef HashHelper_Enable
 	HashHelper* m_HashHelper;
 	BYTE m_hash[HashHelper_HashSize];
 #endif
