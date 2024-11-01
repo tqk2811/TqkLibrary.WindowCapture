@@ -2,7 +2,7 @@
 #define _WindowCapture_H_HashHelper_H_
 
 #include "WinApi.hpp"
-#define HashHelper_Enable
+//#define HashHelper_Enable
 #define HashHelper_HashSize 8
 
 class HashHelper
