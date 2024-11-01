@@ -66,8 +66,7 @@ namespace WpfTest
         {
             _windowHandle = GetHandler();
 
-            _baseCapture = new BitbltCapture();
-            //_baseCapture = new PrintWindowCapture();
+            _baseCapture = new HdcCapture();
 
 
             if (!_baseCapture.Init(_windowHandle))

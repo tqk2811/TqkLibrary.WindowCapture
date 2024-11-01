@@ -176,18 +176,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="BaseCapture.hpp" />
-    <ClInclude Include="BitbltCapture.hpp" />
     <ClInclude Include="CpuInstructionHelper.hpp" />
     <ClInclude Include="D3DClass.hpp" />
     <ClInclude Include="DesktopDuplicationCapture.hpp" />
     <ClInclude Include="Directx.hpp" />
     <ClInclude Include="Exports.hpp" />
     <ClInclude Include="Gdi.hpp" />
-    <ClInclude Include="HdcHelper.hpp" />
+    <ClInclude Include="HdcCapture.hpp" />
     <ClInclude Include="InputTextureClass.hpp" />
     <ClInclude Include="HashHelper.hpp" />
     <ClInclude Include="PixelShaderClass.hpp" />
-    <ClInclude Include="PrintWindowCapture.hpp" />
     <ClInclude Include="RenderCapture.hpp" />
     <ClInclude Include="RenderTextureSurfaceClass.hpp" />
     <ClInclude Include="Utils.hpp" />
@@ -196,16 +194,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BaseCapture.cpp" />
-    <ClCompile Include="BitbltCapture.cpp" />
     <ClCompile Include="CpuInstructionHelper.cpp" />
     <ClCompile Include="D3DClass.cpp" />
     <ClCompile Include="DesktopDuplicationCapture.cpp" />
     <ClCompile Include="dllmain.cpp" />
-    <ClCompile Include="HdcHelper.cpp" />
+    <ClCompile Include="HdcCapture.cpp" />
     <ClCompile Include="InputTextureClass.cpp" />
     <ClCompile Include="HashHelper.cpp" />
     <ClCompile Include="PixelShaderClass.cpp" />
-    <ClCompile Include="PrintWindowCapture.cpp" />
     <ClCompile Include="RenderCapture.cpp" />
     <ClCompile Include="RenderTextureSurfaceClass.cpp" />
     <ClCompile Include="Utils.cpp" />

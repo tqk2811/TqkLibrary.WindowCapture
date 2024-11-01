@@ -1,13 +1,83 @@
-#include "HdcHelper.hpp"
-#include "Utils.hpp"
-#define __CheckBitmap__
+#include "HdcCapture.hpp"
 
-BOOL HDC_GetSize(const HWND hwnd, UINT32& width, UINT32& height)
+HdcCapture* HdcCapture_Alloc()
+{
+	return new HdcCapture();
+}
+HdcCaptureMode HdcCapture_GetMode(HdcCapture* hdcCapture)
+{
+	return hdcCapture->GetMode();
+}
+VOID HdcCapture_SetMode(HdcCapture* hdcCapture, HdcCaptureMode mode)
+{
+	hdcCapture->SetMode(mode);
+}
+
+
+
+
+
+HdcCapture::HdcCapture()
+{
+	this->_hdc = CreateCompatibleDC(NULL);
+	assert(this->_hdc);
+}
+HdcCapture::~HdcCapture()
+{
+	if (_hdc)
+		DeleteDC(_hdc);
+	_hdc = NULL;
+}
+
+HdcCaptureMode HdcCapture::GetMode()
+{
+	return this->_mode;
+}
+VOID HdcCapture::SetMode(HdcCaptureMode mode)
+{
+	_mode = mode;
+}
+
+BOOL HdcCapture::InitCapture(HWND hWnd)
+{
+	if (!this->_hdc)
+		return FALSE;
+
+	if (!hWnd || hWnd == INVALID_HANDLE_VALUE)
+		return FALSE;
+	this->m_hWnd = hWnd;
+
+	return TRUE;
+}
+BOOL HdcCapture::Draw(ID3D11Device* device, ID3D11DeviceContext* deviceCtx, ComPtr<ID3D11Texture2D>& texture)
+{
+	if (!device || !deviceCtx)
+		return FALSE;
+
+	HBITMAP hBitmap = CaptureToHBitmap(this->_mode);
+	if (!hBitmap || hBitmap == INVALID_HANDLE_VALUE)
+		return FALSE;
+
+	BOOL result = CopyBitmapToTexture(hBitmap, this->_hdc, device, deviceCtx, texture
+#ifdef HashHelper_Enable
+		, m_HashHelper, this->m_hash
+#endif
+	);
+
+	DeleteObject(hBitmap);
+
+	return result;
+}
+HBITMAP HdcCapture::Shoot()
+{
+	return CaptureToHBitmap(this->_mode);
+}
+BOOL HdcCapture::GetSize(UINT32& width, UINT32& height)
 {
 	BOOL result = FALSE;
 	HDC hdcSource{ 0 };
 
-	hdcSource = GetDC(hwnd);
+	hdcSource = GetDC(this->m_hWnd);
 	if (!hdcSource)
 		goto end;
 
@@ -23,7 +93,7 @@ BOOL HDC_GetSize(const HWND hwnd, UINT32& width, UINT32& height)
 	height = srcBitmapHeader.bmHeight;
 #else
 	RECT rcClient;
-	if (!GetClientRect(hwnd, &rcClient))
+	if (!GetClientRect(this->m_hWnd, &rcClient))
 		goto end;
 
 	width = rcClient.right - rcClient.left;
@@ -33,12 +103,13 @@ BOOL HDC_GetSize(const HWND hwnd, UINT32& width, UINT32& height)
 
 end:
 	if (hdcSource)
-		ReleaseDC(hwnd, hdcSource);
+		ReleaseDC(this->m_hWnd, hdcSource);
 	return result;
 }
 
 
-HBITMAP HDC_CaptureToHBitmap(HWND hwnd, Hdc_Capture_Mode mode)
+
+HBITMAP HdcCapture::CaptureToHBitmap(HdcCaptureMode mode)
 {
 	BOOL isSuccess = FALSE;
 	int width;
@@ -52,7 +123,7 @@ HBITMAP HDC_CaptureToHBitmap(HWND hwnd, Hdc_Capture_Mode mode)
 	HBITMAP hBitmap{ 0 };
 
 
-	hdcSource = GetDC(hwnd);
+	hdcSource = GetDC(this->m_hWnd);
 	if (!hdcSource)
 		goto end;
 
@@ -69,7 +140,7 @@ HBITMAP HDC_CaptureToHBitmap(HWND hwnd, Hdc_Capture_Mode mode)
 		height = srcBitmapHeader.bmHeight;
 #else
 		RECT rcClient;
-		if (!GetClientRect(hwnd, &rcClient))
+		if (!GetClientRect(this->m_hWnd, &rcClient))
 			goto end;
 
 		width = rcClient.right - rcClient.left;
@@ -90,14 +161,14 @@ HBITMAP HDC_CaptureToHBitmap(HWND hwnd, Hdc_Capture_Mode mode)
 
 	switch (mode)
 	{
-	case Hdc_Capture_Mode::Hdc_Capture_Mode_BitBlt:
+	case HdcCaptureMode::HdcCaptureMode_BitBlt:
 		if (!BitBlt(hdcDest, 0, 0, width, height, hdcSource, 0, 0, SRCCOPY))
 			goto end;
 		isSuccess = TRUE;
 		break;
 
-	case Hdc_Capture_Mode::Hdc_Capture_Mode_PrintWindow:
-		if (!PrintWindow(hwnd, hdcDest, 0))
+	case HdcCaptureMode::HdcCaptureMode_PrintWindow:
+		if (!PrintWindow(this->m_hWnd, hdcDest, 0))
 			goto end;
 		isSuccess = TRUE;
 		break;
@@ -113,7 +184,7 @@ end:
 	if (hdcDest)
 		DeleteDC(hdcDest);
 	if (hdcSource)
-		ReleaseDC(hwnd, hdcSource);
+		ReleaseDC(this->m_hWnd, hdcSource);
 	if (isSuccess)
 	{
 		return hBitmap;
@@ -127,14 +198,15 @@ end:
 }
 
 
-BOOL HDC_CopyBitmapToTexture(
+
+BOOL HdcCapture::CopyBitmapToTexture(
 	const HBITMAP hBitmap,
 	const HDC hdc,
 	ID3D11Device* device,
 	ID3D11DeviceContext* deviceCtx,
 	ComPtr<ID3D11Texture2D>& texture
 #ifdef HashHelper_Enable
-	,HashHelper* pHashHelper,
+	, HashHelper* pHashHelper,
 	BYTE* oldHash
 #endif
 )

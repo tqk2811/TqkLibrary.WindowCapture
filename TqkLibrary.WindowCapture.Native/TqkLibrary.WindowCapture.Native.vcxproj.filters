@@ -43,12 +43,6 @@
     <Filter Include="Captures\Hdc">
       <UniqueIdentifier>{4d308e42-e1a3-4523-ac52-f201231964d1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Captures\Hdc\Bitblt">
-      <UniqueIdentifier>{1cfa800e-f1a4-4b7b-acc3-4571e0902812}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Captures\Hdc\PrintWindow">
-      <UniqueIdentifier>{8c421acb-aa1a-425f-b51d-25b9204845fd}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PixelShaderClass.hpp">
@@ -78,9 +72,6 @@
     <ClInclude Include="RenderCapture.hpp">
       <Filter>D3D</Filter>
     </ClInclude>
-    <ClInclude Include="BitbltCapture.hpp">
-      <Filter>Captures\Hdc\Bitblt</Filter>
-    </ClInclude>
     <ClInclude Include="BaseCapture.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -90,12 +81,6 @@
     <ClInclude Include="DesktopDuplicationCapture.hpp">
       <Filter>Captures\DesktopDuplication</Filter>
     </ClInclude>
-    <ClInclude Include="PrintWindowCapture.hpp">
-      <Filter>Captures\Hdc\PrintWindow</Filter>
-    </ClInclude>
-    <ClInclude Include="HdcHelper.hpp">
-      <Filter>Captures\Hdc</Filter>
-    </ClInclude>
     <ClInclude Include="Utils.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -104,6 +89,9 @@
     </ClInclude>
     <ClInclude Include="CpuInstructionHelper.hpp">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HdcCapture.hpp">
+      <Filter>Captures\Hdc</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -122,9 +110,6 @@
     <ClCompile Include="RenderCapture.cpp">
       <Filter>D3D</Filter>
     </ClCompile>
-    <ClCompile Include="BitbltCapture.cpp">
-      <Filter>Captures\Hdc\Bitblt</Filter>
-    </ClCompile>
     <ClCompile Include="InputTextureClass.cpp">
       <Filter>D3D\Source Files</Filter>
     </ClCompile>
@@ -133,12 +118,6 @@
     </ClCompile>
     <ClCompile Include="DesktopDuplicationCapture.cpp">
       <Filter>Captures\DesktopDuplication</Filter>
-    </ClCompile>
-    <ClCompile Include="PrintWindowCapture.cpp">
-      <Filter>Captures\Hdc\PrintWindow</Filter>
-    </ClCompile>
-    <ClCompile Include="HdcHelper.cpp">
-      <Filter>Captures\Hdc</Filter>
     </ClCompile>
     <ClCompile Include="Utils.cpp">
       <Filter>Source Files</Filter>
@@ -151,6 +130,9 @@
     </ClCompile>
     <ClCompile Include="dllmain.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HdcCapture.cpp">
+      <Filter>Captures\Hdc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

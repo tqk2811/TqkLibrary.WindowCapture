@@ -5,6 +5,8 @@
 #include "D3DClass.hpp"
 #include "Exports.hpp"
 #include "HashHelper.hpp"
+
+
 class BaseCapture
 {
 public:
