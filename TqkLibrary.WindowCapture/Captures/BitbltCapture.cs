@@ -11,7 +11,7 @@ namespace TqkLibrary.WindowCapture.Captures
     public class BitbltCapture : BaseCapture
     {
 
-        [DllImport("TqkLibrary.WindowCapture.Native.dll", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(_dllName, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr BitbltCapture_Alloc();
 
         public BitbltCapture() : base(BitbltCapture_Alloc())

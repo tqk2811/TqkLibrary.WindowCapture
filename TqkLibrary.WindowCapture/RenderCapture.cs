@@ -9,13 +9,13 @@ namespace TqkLibrary.WindowCapture
 {
     public class RenderCapture : BaseNative
     {
-        [DllImport("TqkLibrary.WindowCapture.Native.dll", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(_dllName, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr RenderCapture_Alloc();
 
-        [DllImport("TqkLibrary.WindowCapture.Native.dll", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(_dllName, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
         public static extern void RenderCapture_Free(ref IntPtr pointer);
 
-        [DllImport("TqkLibrary.WindowCapture.Native.dll", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(_dllName, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
         public static extern bool RenderCapture_Render(IntPtr pointer, IntPtr capture, IntPtr surface, bool isNewSurface, ref bool isNewtargetView);
 
 

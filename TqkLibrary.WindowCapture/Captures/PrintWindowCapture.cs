@@ -10,7 +10,7 @@ namespace TqkLibrary.WindowCapture.Captures
     public class PrintWindowCapture : BaseCapture
     {
 
-        [DllImport("TqkLibrary.WindowCapture.Native.dll", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(_dllName, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr PrintWindow_Alloc();
 
         public PrintWindowCapture() : base(PrintWindow_Alloc())

@@ -12,6 +12,7 @@ namespace TqkLibrary.WindowCapture
     public delegate void ReleaseNative(ref IntPtr pointer);
     public abstract class BaseNative
     {
+        protected const string _dllName = "TqkLibrary.WindowCapture.Native.dll";
 #if DEBUG && NETFRAMEWORK
         static BaseNative()
         {
