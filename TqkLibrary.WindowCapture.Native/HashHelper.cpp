@@ -8,7 +8,7 @@ HashHelper::~HashHelper()
 {
 }
 
-INT32 HashHelper::CalcHash(const BYTE const* data, const UINT32 dataSize, BYTE* hash, INT32 hashSize)
+INT32 HashHelper::CalcHash(const BYTE * const data, const UINT32 dataSize, BYTE* hash, INT32 hashSize)
 {
 	INT32 size = -1;
 	if (hashSize >= HashHelper_HashSize)

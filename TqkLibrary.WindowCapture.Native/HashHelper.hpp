@@ -11,7 +11,7 @@ public:
 	HashHelper();
 	~HashHelper();
 
-	INT32 CalcHash(const BYTE const* data, const UINT32 dataSize, BYTE* hash, INT32 hashSize);
+	INT32 CalcHash(const BYTE * const data, const UINT32 dataSize, BYTE* hash, INT32 hashSize);
 
 private:
 };
