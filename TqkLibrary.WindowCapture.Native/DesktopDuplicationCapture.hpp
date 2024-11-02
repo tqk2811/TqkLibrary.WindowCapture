@@ -1,7 +1,11 @@
 #ifndef _WindowCapture_H_DesktopDuplicationCapture_H_
 #define _WindowCapture_H_DesktopDuplicationCapture_H_
 
+//https://learn.microsoft.com/en-us/windows/win32/direct3ddxgi/desktop-dup-api
+
 #include "BaseCapture.hpp"
+
+
 class DesktopDuplicationCapture : public BaseCapture
 {
 public:
