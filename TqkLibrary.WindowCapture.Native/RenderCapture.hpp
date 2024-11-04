@@ -25,6 +25,8 @@ private:
 	VertexShaderClass _vertexShader;
 	RenderTextureSurfaceClass _renderSurface;
 	InputTextureClass _inputTexture;
+
+	ComPtr<ID3D11Texture2D> _texture;
 };
 
 

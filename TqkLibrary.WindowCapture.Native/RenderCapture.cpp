@@ -70,17 +70,16 @@ BOOL RenderCapture::Render(BaseCapture* baseCapture, IUnknown* surface, bool isN
 	if (!result)
 		return FALSE;
 
-	ComPtr<ID3D11Texture2D> texture;
-	BOOL isNewTexture = baseCapture->Draw(device.Get(), deviceCtx.Get(), texture);
+	BOOL isNewTexture = baseCapture->Draw(device.Get(), deviceCtx.Get(), _texture);
 	if (isNewTexture)
 	{
 		D3D11_TEXTURE2D_DESC desc;
-		texture->GetDesc(&desc);
+		_texture->GetDesc(&desc);
 		result = this->_inputTexture.Initialize(device.Get(), desc.Width, desc.Height);
 		if (!result)
 			return FALSE;
 
-		result = this->_inputTexture.Copy(deviceCtx.Get(), texture.Get());
+		result = this->_inputTexture.Copy(deviceCtx.Get(), _texture.Get());
 		if (!result)
 			return FALSE;
 	}
@@ -94,6 +93,7 @@ BOOL RenderCapture::Render(BaseCapture* baseCapture, IUnknown* surface, bool isN
 		this->_renderSurface.SetRenderTarget(deviceCtx.Get(), nullptr);
 		this->_renderSurface.SetViewPort(deviceCtx.Get(), this->_renderSurface.Width(), this->_renderSurface.Height());
 		deviceCtx->Draw(this->_vertexShader.GetVertexCount(), 0);
+		//deviceCtx->Flush();
 	}
 
 	return result;
