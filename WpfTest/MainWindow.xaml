@@ -12,7 +12,7 @@
         Title="MainWindow" Height="450" Width="800" WindowStartupLocation="CenterScreen">
     <Grid>
         <st:StackPanel Orientation="Horizontal">
-            <st:StackPanel VerticalAlignment="Top" HorizontalAlignment="Left" Orientation="Vertical">
+            <st:StackPanel VerticalAlignment="Top" HorizontalAlignment="Left" Orientation="Vertical" Width="70">
                 <TextBlock x:Name="tb_drawTime" Background="White" Foreground="Black" Padding="5"/>
                 <TextBlock x:Name="tb_fps" Background="White" Foreground="Black" Padding="5"/>
             </st:StackPanel>
