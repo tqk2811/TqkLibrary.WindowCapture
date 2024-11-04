@@ -66,9 +66,10 @@ namespace WpfTest
         {
             _windowHandle = GetHandler();
 
-            _baseCapture = new HdcCapture();
+            //_baseCapture = new HdcCapture();
+            _baseCapture = new WindowGraphicCapture();
 
-
+            //Task.Factory.StartNew(() => _baseCapture.Init(_windowHandle), TaskCreationOptions.LongRunning);
             if (!_baseCapture.Init(_windowHandle))
                 throw new Exception();
 
