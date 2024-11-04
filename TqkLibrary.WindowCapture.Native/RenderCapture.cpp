@@ -66,7 +66,7 @@ BOOL RenderCapture::Render(BaseCapture* baseCapture, IUnknown* surface, bool isN
 	ComPtr<ID3D11Device> device = this->_d3d.GetDevice();
 	ComPtr<ID3D11DeviceContext> deviceCtx = this->_d3d.GetDeviceContext();
 
-	BOOL result = this->_renderSurface.Initialize(device.Get(), surface, true, isNewtargetView);
+	BOOL result = this->_renderSurface.Initialize(device.Get(), surface, isNewSurface, isNewtargetView);
 	if (!result)
 		return FALSE;
 
