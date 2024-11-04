@@ -93,6 +93,12 @@
     <ClInclude Include="HdcCapture.hpp">
       <Filter>Captures\Hdc</Filter>
     </ClInclude>
+    <ClInclude Include="WindowGraphicCapture.hpp">
+      <Filter>Captures\Win10_1903</Filter>
+    </ClInclude>
+    <ClInclude Include="WinrtGraphicCapture.hpp">
+      <Filter>Captures\Win10_1903</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="PixelShaderClass.cpp">
@@ -134,6 +140,12 @@
     <ClCompile Include="HdcCapture.cpp">
       <Filter>Captures\Hdc</Filter>
     </ClCompile>
+    <ClCompile Include="WindowGraphicCapture.cpp">
+      <Filter>Captures\Win10_1903</Filter>
+    </ClCompile>
+    <ClCompile Include="WinrtGraphicCapture.cpp">
+      <Filter>Captures\Win10_1903</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="VertexShader.hlsl">
@@ -142,5 +154,8 @@
     <FxCompile Include="PixelShader.hlsl">
       <Filter>D3D\Resource Files</Filter>
     </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>
