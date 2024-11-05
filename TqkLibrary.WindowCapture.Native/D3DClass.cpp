@@ -36,18 +36,18 @@ bool D3DClass::Initialize() {
 		D3D_FEATURE_LEVEL_9_1,
 	};
 	UINT NumFeatureLevels = ARRAYSIZE(FeatureLevels);
-	D3D_FEATURE_LEVEL FeatureLevel;
+	//D3D_FEATURE_LEVEL FeatureLevel;
 	// This flag adds support for surfaces with a different color channel ordering
 	// than the default. It is required for compatibility with Direct2D.
 	UINT creationFlags =
-		D3D11_CREATE_DEVICE_SINGLETHREADED |
+		//D3D11_CREATE_DEVICE_SINGLETHREADED |
 		D3D11_CREATE_DEVICE_BGRA_SUPPORT;
 
 	UINT DriverTypeIndex = 0;
 	for (; DriverTypeIndex < NumDriverTypes; ++DriverTypeIndex)
 	{
 		hr = D3D11CreateDevice(nullptr, DriverTypes[DriverTypeIndex], nullptr, creationFlags, FeatureLevels, NumFeatureLevels,
-			D3D11_SDK_VERSION, this->m_device.GetAddressOf(), &FeatureLevel, this->m_deviceContext.GetAddressOf());
+			D3D11_SDK_VERSION, this->m_device.GetAddressOf(), nullptr, this->m_deviceContext.GetAddressOf());
 		if (SUCCEEDED(hr))
 		{
 			// Device creation succeeded, no need to loop anymore
@@ -60,13 +60,24 @@ bool D3DClass::Initialize() {
 	return true;
 }
 
-ID3D11Device* D3DClass::GetDevice() {
+ComPtr<ID3D11Device> D3DClass::GetDevice() {
 	return this->m_device.Get();
 }
 
-ID3D11DeviceContext* D3DClass::GetDeviceContext() {
+ComPtr<ID3D11DeviceContext> D3DClass::GetDeviceContext() {
 	return this->m_deviceContext.Get();
 }
+
+ComPtr<IDXGIDevice> D3DClass::GetDXGIDevice() {
+	ComPtr<IDXGIDevice> dxgiDevice;
+	HRESULT hr = m_device->QueryInterface<IDXGIDevice>(dxgiDevice.GetAddressOf());
+	if (FAILED(hr))
+	{
+		throw -1;
+	}
+	return dxgiDevice;
+}
+
 
 void D3DClass::Shutdown() {
 	m_device.Reset();

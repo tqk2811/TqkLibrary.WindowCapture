@@ -10,7 +10,7 @@ PixelShaderClass::PixelShaderClass() {
 PixelShaderClass::~PixelShaderClass() {
 	this->Shutdown();
 }
-bool PixelShaderClass::Initialize(ID3D11Device* d3d11_device, D3D11_FILTER filter) {
+bool PixelShaderClass::Initialize(ComPtr<ID3D11Device> d3d11_device, D3D11_FILTER filter) {
 	if (this->m_d3d11_pixelShader != nullptr) return true;
 
 	UINT Size = ARRAYSIZE(g_PS);
@@ -27,13 +27,13 @@ bool PixelShaderClass::Initialize(ID3D11Device* d3d11_device, D3D11_FILTER filte
 
 	return true;
 }
-void PixelShaderClass::Set(ID3D11DeviceContext* d3d11_deviceCtx, ID3D11ShaderResourceView* colorResourceView) {
+void PixelShaderClass::Set(ComPtr<ID3D11DeviceContext> d3d11_deviceCtx, ComPtr<ID3D11ShaderResourceView> colorResourceView) {
 
 	d3d11_deviceCtx->PSSetShader(this->m_d3d11_pixelShader.Get(), nullptr, 0);
 
 	d3d11_deviceCtx->PSSetSamplers(0, 1, this->m_d3d11_samplerState.GetAddressOf());
 
-	std::array<ID3D11ShaderResourceView*, 1> const textureViews = { colorResourceView };
+	std::array<ID3D11ShaderResourceView*, 1> const textureViews = { colorResourceView.Get() };
 	d3d11_deviceCtx->PSSetShaderResources(0, (UINT32)textureViews.size(), textureViews.data());
 
 }

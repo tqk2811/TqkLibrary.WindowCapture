@@ -187,12 +187,11 @@
     <ClInclude Include="InputTextureClass.hpp" />
     <ClInclude Include="HashHelper.hpp" />
     <ClInclude Include="PixelShaderClass.hpp" />
-    <ClInclude Include="RenderCapture.hpp" />
     <ClInclude Include="RenderTextureSurfaceClass.hpp" />
+    <ClInclude Include="RenderToSurface.hpp" />
     <ClInclude Include="Utils.hpp" />
     <ClInclude Include="VertexShaderClass.hpp" />
     <ClInclude Include="WinApi.hpp" />
-    <ClInclude Include="WindowGraphicCapture.hpp" />
     <ClInclude Include="WinrtGraphicCapture.hpp" />
   </ItemGroup>
   <ItemGroup>
@@ -205,11 +204,10 @@
     <ClCompile Include="InputTextureClass.cpp" />
     <ClCompile Include="HashHelper.cpp" />
     <ClCompile Include="PixelShaderClass.cpp" />
-    <ClCompile Include="RenderCapture.cpp" />
     <ClCompile Include="RenderTextureSurfaceClass.cpp" />
+    <ClCompile Include="RenderToSurface.cpp" />
     <ClCompile Include="Utils.cpp" />
     <ClCompile Include="VertexShaderClass.cpp" />
-    <ClCompile Include="WindowGraphicCapture.cpp" />
     <ClCompile Include="WinrtGraphicCapture.cpp" />
   </ItemGroup>
   <ItemGroup>

@@ -52,7 +52,6 @@ namespace WpfTest
         readonly Stopwatch _stopwatch = new Stopwatch();
         readonly IntPtr _windowHandle;
         readonly BaseCapture _baseCapture;
-        readonly RenderCapture _renderCapture;
 
 
         bool _lastVisible;
@@ -67,13 +66,16 @@ namespace WpfTest
             _windowHandle = GetHandler();
 
             //_baseCapture = new HdcCapture();
-            _baseCapture = new WindowGraphicCapture();
+            _baseCapture = new WinrtGraphicCapture();
 
-            //Task.Factory.StartNew(() => _baseCapture.Init(_windowHandle), TaskCreationOptions.LongRunning);
             if (!_baseCapture.Init(_windowHandle))
                 throw new Exception();
 
-            _renderCapture = new RenderCapture(_baseCapture);
+
+            //using (Bitmap? bitmap = _baseCapture.CaptureImage())
+            //{
+            //    bitmap?.Save("D:\\test.png", System.Drawing.Imaging.ImageFormat.Png);
+            //}
 
             InitializeComponent();
         }
@@ -148,7 +150,7 @@ namespace WpfTest
 
             _stopwatch.Restart();
             bool isNewtargetView = false;
-            if (_renderCapture.Draw(surface, isNewSurface, ref isNewtargetView))
+            if (_baseCapture.Render(surface, isNewSurface, ref isNewtargetView))
             {
                 _stopwatch.Stop();
                 fpsCount++;

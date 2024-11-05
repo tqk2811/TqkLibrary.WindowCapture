@@ -49,29 +49,100 @@ BOOL HdcCapture::InitCapture(HWND hWnd)
 
 	return TRUE;
 }
-BOOL HdcCapture::Draw(ID3D11Device* device, ID3D11DeviceContext* deviceCtx, ComPtr<ID3D11Texture2D>& texture)
+//BOOL HdcCapture::Draw(ID3D11Device* device, ID3D11DeviceContext* deviceCtx, ComPtr<ID3D11Texture2D>& texture)
+//{
+//	if (!device || !deviceCtx)
+//		return FALSE;
+//
+//	HBITMAP hBitmap = CaptureToHBitmap(this->_mode);
+//	if (!hBitmap || hBitmap == INVALID_HANDLE_VALUE)
+//		return FALSE;
+//
+//	BOOL result = CopyBitmapToTexture(hBitmap, this->_hdc, device, deviceCtx, texture
+//#ifdef HashHelper_Enable
+//		, m_HashHelper, this->m_hash
+//#endif
+//	);
+//
+//	DeleteObject(hBitmap);
+//
+//	return result;
+//}
+//HBITMAP HdcCapture::Shoot()
+//{
+//	return CaptureToHBitmap(this->_mode);
+//}
+
+BOOL HdcCapture::Render(IDXGISurface* surface, bool isNewSurface, bool& isNewtargetView)
 {
-	if (!device || !deviceCtx)
-		return FALSE;
+//	HBITMAP hBitmap = CaptureToHBitmap(this->_mode);
+//	if (!hBitmap || hBitmap == INVALID_HANDLE_VALUE)
+//		return FALSE;
+// 
+//	ComPtr<ID3D11Device> device;
+//	ComPtr<ID3D11DeviceContext> deviceCtx;
+//	ComPtr<ID3D11Texture2D> texture;
+//
+//	BOOL result = CopyBitmapToTexture(hBitmap, this->_hdc, device.Get(), deviceCtx.Get(), texture
+//#ifdef HashHelper_Enable
+//		, m_HashHelper, this->m_hash
+//#endif
+//	);
+//	DeleteObject(hBitmap);
+
+	return FALSE;
+}
+BOOL HdcCapture::CaptureImage(void* data, UINT32 width, UINT32 height, UINT32 linesize)
+{
+	BOOL result = FALSE;
+	HRESULT hr{};
+	BITMAP bitmap{};
+	BITMAPINFOHEADER bi{ };
+	DWORD dwBmpSize = 0;
+
 
 	HBITMAP hBitmap = CaptureToHBitmap(this->_mode);
 	if (!hBitmap || hBitmap == INVALID_HANDLE_VALUE)
 		return FALSE;
 
-	BOOL result = CopyBitmapToTexture(hBitmap, this->_hdc, device, deviceCtx, texture
-#ifdef HashHelper_Enable
-		, m_HashHelper, this->m_hash
-#endif
-	);
+	HGDIOBJ obj = SelectObject(this->_hdc, hBitmap);
 
+	result = GetObject(hBitmap, sizeof(BITMAP), &bitmap) == sizeof(BITMAP);
+	if (!result)
+		goto end;
+
+
+	bi.biSize = sizeof(BITMAPINFOHEADER);
+	bi.biWidth = bitmap.bmWidth;
+	bi.biHeight = -bitmap.bmHeight;
+	bi.biPlanes = 1;
+	bi.biBitCount = 32;
+	bi.biCompression = BI_RGB;
+	bi.biSizeImage = 0;
+	bi.biXPelsPerMeter = 0;
+	bi.biYPelsPerMeter = 0;
+	bi.biClrUsed = 0;
+	bi.biClrImportant = 0;
+
+	dwBmpSize = bitmap.bmWidth * 4 * bitmap.bmHeight;
+
+	assert(width == bitmap.bmWidth);
+	assert(height == bitmap.bmHeight);
+	assert(dwBmpSize == height * linesize);
+
+	result = GetDIBits(this->_hdc, hBitmap, 0,
+		(UINT)bitmap.bmHeight,
+		data,
+		(BITMAPINFO*)&bi,
+		DIB_RGB_COLORS) == bitmap.bmHeight;
+	if (!result)
+		goto end;
+
+end:
 	DeleteObject(hBitmap);
-
 	return result;
 }
-HBITMAP HdcCapture::Shoot()
-{
-	return CaptureToHBitmap(this->_mode);
-}
+
 BOOL HdcCapture::GetSize(UINT32& width, UINT32& height)
 {
 	BOOL result = FALSE;
@@ -146,7 +217,7 @@ HBITMAP HdcCapture::CaptureToHBitmap(HdcCaptureMode mode)
 		width = rcClient.right - rcClient.left;
 		height = rcClient.bottom - rcClient.top;
 #endif
-	}
+}
 
 	hdcDest = CreateCompatibleDC(hdcSource);
 	if (!hdcDest)
@@ -158,6 +229,9 @@ HBITMAP HdcCapture::CaptureToHBitmap(HdcCaptureMode mode)
 
 	if (!SelectObject(hdcDest, hBitmap))
 		goto end;
+
+	//SetMapMode(hdcDest, MM_LOENGLISH);
+	//SetStretchBltMode(hdcDest, COLORONCOLOR);
 
 	switch (mode)
 	{
@@ -196,8 +270,6 @@ end:
 		return NULL;
 	}
 }
-
-
 
 BOOL HdcCapture::CopyBitmapToTexture(
 	const HBITMAP hBitmap,
@@ -242,7 +314,7 @@ BOOL HdcCapture::CopyBitmapToTexture(
 
 	bi.biSize = sizeof(BITMAPINFOHEADER);
 	bi.biWidth = bitmap.bmWidth;
-	bi.biHeight = bitmap.bmHeight;
+	bi.biHeight = -bitmap.bmHeight;
 	bi.biPlanes = 1;
 	bi.biBitCount = 32;
 	bi.biCompression = BI_RGB;
@@ -252,7 +324,7 @@ BOOL HdcCapture::CopyBitmapToTexture(
 	bi.biClrUsed = 0;
 	bi.biClrImportant = 0;
 
-	dwBmpSize = ((bitmap.bmWidth * 32 /*+ 31*/) / 32) * 4 * bitmap.bmHeight;
+	dwBmpSize = bitmap.bmWidth * 4 * bitmap.bmHeight;
 	pData = new BYTE[dwBmpSize];
 
 	result = GetDIBits(hdc, hBitmap, 0,
@@ -280,25 +352,37 @@ BOOL HdcCapture::CopyBitmapToTexture(
 		{
 			goto end;
 		}
-	}
+}
 #endif // #ifdef HashHelper_HashSize
 
 	{
 		D3D11_TEXTURE2D_DESC texDesc;
 		ZeroMemory(&texDesc, sizeof(D3D11_TEXTURE2D_DESC));
-		texDesc.Width = bitmap.bmWidth;
-		texDesc.Height = bitmap.bmHeight;
-		texDesc.MipLevels = 1;
-		texDesc.ArraySize = 1;
-		texDesc.Format = DXGI_FORMAT::DXGI_FORMAT_B8G8R8A8_UNORM;
-		texDesc.SampleDesc.Count = 1;
-		texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;//0
-		texDesc.Usage = D3D11_USAGE_DYNAMIC;// D3D11_USAGE_DEFAULT;
-		texDesc.MiscFlags = 0;
-		texDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-		hr = device->CreateTexture2D(&texDesc, NULL, texture.ReleaseAndGetAddressOf());
-		if (FAILED(hr))
-			goto end;
+
+		if (texture.Get())
+			texture->GetDesc(&texDesc);
+
+		if (texDesc.Width != bitmap.bmWidth ||
+			texDesc.Height != bitmap.bmHeight ||
+			(texDesc.BindFlags & D3D11_BIND_SHADER_RESOURCE) != D3D11_BIND_SHADER_RESOURCE &&
+			texDesc.Usage != D3D11_USAGE_DYNAMIC ||
+			texDesc.CPUAccessFlags != D3D11_CPU_ACCESS_WRITE)
+		{
+			//create new texture
+			texDesc.Width = bitmap.bmWidth;
+			texDesc.Height = bitmap.bmHeight;
+			texDesc.MipLevels = 1;
+			texDesc.ArraySize = 1;
+			texDesc.Format = DXGI_FORMAT::DXGI_FORMAT_B8G8R8A8_UNORM;
+			texDesc.SampleDesc.Count = 1;
+			texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;//0
+			texDesc.Usage = D3D11_USAGE_DYNAMIC;// D3D11_USAGE_DEFAULT;
+			texDesc.MiscFlags = 0;
+			texDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+			hr = device->CreateTexture2D(&texDesc, NULL, texture.ReleaseAndGetAddressOf());
+			if (FAILED(hr))
+				goto end;
+		}
 	}
 
 	hr = deviceCtx->Map(texture.Get(), 0, D3D11_MAP::D3D11_MAP_WRITE_DISCARD, 0, &map);
@@ -307,16 +391,21 @@ BOOL HdcCapture::CopyBitmapToTexture(
 
 	{
 		UINT64 bitmapLineSize = 4 * bitmap.bmWidth;
-		UINT64 sizeCopy = min(bitmapLineSize, map.RowPitch);
-
-		//bit map flipped Y-axis
-		for (int i = 0; i < bitmap.bmHeight; i++)
+		if (map.RowPitch == bitmapLineSize)
 		{
-			memcpy(
-				(void*)((UINT64)map.pData + (UINT64)(map.RowPitch * (bitmap.bmHeight - 1 - i))),
-				(void*)((UINT64)pData + (UINT64)(bitmapLineSize * i)),
-				sizeCopy
-			);
+			memcpy(map.pData, pData, map.DepthPitch);
+		}
+		else
+		{
+			UINT64 sizeCopy = min(bitmapLineSize, map.RowPitch);
+			for (int i = 0; i < bitmap.bmHeight; i++)
+			{
+				memcpy(
+					(void*)((UINT64)map.pData + (UINT64)(map.RowPitch * i)),
+					(void*)((UINT64)pData + (UINT64)(bitmapLineSize * i)),
+					sizeCopy
+				);
+			}
 		}
 	}
 	deviceCtx->Unmap(texture.Get(), 0);

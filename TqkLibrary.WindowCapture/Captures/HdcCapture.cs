@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
@@ -27,7 +29,6 @@ namespace TqkLibrary.WindowCapture.Captures
         public static extern void HdcCapture_SetMode(IntPtr pointer, HdcCaptureMode mode);
 
 
-
         public HdcCapture() : base(HdcCapture_Alloc())
         {
 
@@ -37,6 +38,35 @@ namespace TqkLibrary.WindowCapture.Captures
         {
             get { return HdcCapture_GetMode(this.Pointer); }
             set { HdcCapture_SetMode(this.Pointer, value); }
+        }
+
+        public override Bitmap? CaptureImage()
+        {
+            Size size = Size;
+            if (size.Width <= 0 || size.Height <= 0) return null;
+
+            Bitmap bitmap = new Bitmap(size.Width, size.Height);
+            BitmapData bitmapData = bitmap.LockBits(new Rectangle(0, 0, size.Width, size.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppRgb);
+
+            //ARGB only
+            bool result = BaseCapture_CaptureImage(
+                base.Pointer,
+                bitmapData.Scan0,
+                (UInt32)bitmapData.Width,
+                (UInt32)bitmapData.Height,
+                (UInt32)bitmapData.Stride
+                );
+            bitmap.UnlockBits(bitmapData);
+
+            if (result)
+            {
+                return bitmap;
+            }
+            else
+            {
+                bitmap.Dispose();
+                return null;
+            }
         }
     }
 }

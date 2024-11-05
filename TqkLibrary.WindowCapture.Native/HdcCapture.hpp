@@ -24,9 +24,9 @@ public:
 	HdcCaptureMode GetMode();
 	VOID SetMode(HdcCaptureMode mode);
 
-	BOOL InitCapture(HWND hWnd);
-	BOOL Draw(ID3D11Device* device, ID3D11DeviceContext* deviceCtx, ComPtr<ID3D11Texture2D>& texture);
-	HBITMAP Shoot();
+	BOOL InitCapture(HWND hWnd);	
+	BOOL Render(IDXGISurface* surface, bool isNewSurface, bool& isNewtargetView) ;
+	BOOL CaptureImage(void* data, UINT32 width, UINT32 height, UINT32 linesize);
 	BOOL GetSize(UINT32& width, UINT32& height);
 private:
 	HDC _hdc{ 0 };

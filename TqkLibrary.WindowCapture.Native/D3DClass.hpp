@@ -11,8 +11,9 @@ public:
 	bool Initialize();
 	void Shutdown();
 
-	ID3D11Device* GetDevice();
-	ID3D11DeviceContext* GetDeviceContext();
+	ComPtr<ID3D11Device> GetDevice();
+	ComPtr<ID3D11DeviceContext> GetDeviceContext();
+	ComPtr<IDXGIDevice> GetDXGIDevice();
 private:
 	ComPtr<ID3D11Device> m_device = nullptr;
 	ComPtr<ID3D11DeviceContext> m_deviceContext = nullptr;

@@ -19,7 +19,7 @@ VertexShaderClass::~VertexShaderClass() {
 	this->Shutdown();
 }
 
-bool VertexShaderClass::Initialize(ID3D11Device* d3d11_device) {
+bool VertexShaderClass::Initialize(ComPtr<ID3D11Device> d3d11_device) {
 	if (this->m_d3d11_vertexShader != nullptr) return true;
 
 	UINT Size = ARRAYSIZE(g_VS);
@@ -67,7 +67,7 @@ bool VertexShaderClass::Initialize(ID3D11Device* d3d11_device) {
 
 	return true;
 }
-void VertexShaderClass::Set(ID3D11DeviceContext* d3d11_deviceCtx) {
+void VertexShaderClass::Set(ComPtr<ID3D11DeviceContext> d3d11_deviceCtx) {
 	d3d11_deviceCtx->VSSetShader(this->m_d3d11_vertexShader.Get(), nullptr, 0);
 	d3d11_deviceCtx->IASetInputLayout(this->m_d3d11_inputLayout.Get());
 	UINT Stride = sizeof(VERTEX);

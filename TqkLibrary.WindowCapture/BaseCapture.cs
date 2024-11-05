@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -15,17 +16,22 @@ namespace TqkLibrary.WindowCapture
         [DllImport(_dllName, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
         public static extern void BaseCapture_Free(ref IntPtr pointer);
 
-        [DllImport(_dllName, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
-        public static extern bool BaseCapture_InitCapture(IntPtr pointer, IntPtr handle);
 
         [DllImport(_dllName, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr BaseCapture_Shoot(IntPtr pointer);
+        public static extern bool BaseCapture_InitCapture(IntPtr pointer, IntPtr hwnd);
+
 
         [DllImport(_dllName, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
         public static extern bool BaseCapture_GetSize(IntPtr pointer, ref UInt32 width, ref UInt32 height);
 
+
         [DllImport(_dllName, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
-        public static extern bool HBITMAP_Release(IntPtr hbitmap);
+        public static extern bool BaseCapture_CaptureImage(IntPtr pointer, IntPtr data, UInt32 width, UInt32 height, UInt32 lineSize);
+
+
+        [DllImport(_dllName, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
+        public static extern bool BaseCapture_Render(IntPtr pointer, IntPtr surface, bool isNewSurface, ref bool isNewtargetView);
+
 
 
         public virtual Size Size
@@ -34,7 +40,7 @@ namespace TqkLibrary.WindowCapture
             {
                 UInt32 width = 0;
                 UInt32 height = 0;
-                if(BaseCapture_GetSize(this.Pointer, ref width, ref height))
+                if (BaseCapture_GetSize(this.Pointer, ref width, ref height))
                 {
                     return new Size((int)width, (int)height);
                 }
@@ -45,25 +51,12 @@ namespace TqkLibrary.WindowCapture
         {
         }
 
-        public virtual bool Init(IntPtr captureHandler)
-            => BaseCapture_InitCapture(Pointer, captureHandler);
+        public virtual bool Init(IntPtr hwnd)
+            => BaseCapture_InitCapture(Pointer, hwnd);
 
-        public virtual Bitmap? Shoot()
-        {
-            IntPtr hBitmap = BaseCapture_Shoot(Pointer);
-            if(hBitmap != IntPtr.Zero)
-            {
-                try
-                {
-                    return Bitmap.FromHbitmap(hBitmap);
-                }
-                finally
-                {
-                    HBITMAP_Release(hBitmap);
-                }
-            }
-            return null;
-        }
+        public abstract Bitmap? CaptureImage();
 
+        public bool Render(IntPtr surface, bool isNewSurface, ref bool isNewtargetView)
+            => BaseCapture_Render(Pointer, surface, isNewSurface, ref isNewtargetView);
     }
 }

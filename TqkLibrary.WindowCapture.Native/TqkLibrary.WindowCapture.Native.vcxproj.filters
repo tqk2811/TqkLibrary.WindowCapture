@@ -69,9 +69,6 @@
     <ClInclude Include="RenderTextureSurfaceClass.hpp">
       <Filter>D3D\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="RenderCapture.hpp">
-      <Filter>D3D</Filter>
-    </ClInclude>
     <ClInclude Include="BaseCapture.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -93,11 +90,11 @@
     <ClInclude Include="HdcCapture.hpp">
       <Filter>Captures\Hdc</Filter>
     </ClInclude>
-    <ClInclude Include="WindowGraphicCapture.hpp">
-      <Filter>Captures\Win10_1903</Filter>
-    </ClInclude>
     <ClInclude Include="WinrtGraphicCapture.hpp">
       <Filter>Captures\Win10_1903</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderToSurface.hpp">
+      <Filter>D3D</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -112,9 +109,6 @@
     </ClCompile>
     <ClCompile Include="RenderTextureSurfaceClass.cpp">
       <Filter>D3D\Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="RenderCapture.cpp">
-      <Filter>D3D</Filter>
     </ClCompile>
     <ClCompile Include="InputTextureClass.cpp">
       <Filter>D3D\Source Files</Filter>
@@ -140,11 +134,11 @@
     <ClCompile Include="HdcCapture.cpp">
       <Filter>Captures\Hdc</Filter>
     </ClCompile>
-    <ClCompile Include="WindowGraphicCapture.cpp">
-      <Filter>Captures\Win10_1903</Filter>
-    </ClCompile>
     <ClCompile Include="WinrtGraphicCapture.cpp">
       <Filter>Captures\Win10_1903</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderToSurface.cpp">
+      <Filter>D3D</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

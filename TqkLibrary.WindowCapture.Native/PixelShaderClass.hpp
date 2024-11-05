@@ -7,8 +7,8 @@ public:
 	PixelShaderClass();
 	~PixelShaderClass();
 
-	bool Initialize(ID3D11Device* d3d11_device, D3D11_FILTER filter);
-	void Set(ID3D11DeviceContext* d3d11_deviceCtx, ID3D11ShaderResourceView* colorResourceView);
+	bool Initialize(ComPtr<ID3D11Device> d3d11_device, D3D11_FILTER filter);
+	void Set(ComPtr<ID3D11DeviceContext> d3d11_deviceCtx, ComPtr<ID3D11ShaderResourceView> colorResourceView);
 	void Shutdown();
 
 private:

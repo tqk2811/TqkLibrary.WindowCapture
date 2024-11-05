@@ -26,19 +26,12 @@ BOOL BaseCapture_GetSize(BaseCapture* pBaseCapture, UINT32& width, UINT32& heigh
 	return FALSE;
 
 }
-HBITMAP BaseCapture_Shoot(BaseCapture* pBitbltCapture)
-{
-	if (pBitbltCapture)
-		return pBitbltCapture->Shoot();
-	return NULL;
-}
-
 BOOL HBITMAP_Release(HBITMAP hbitmap)
 {
 	return DeleteObject(hbitmap);
 }
 
-BaseCapture::BaseCapture() 
+BaseCapture::BaseCapture()
 {
 #ifdef HashHelper_Enable
 	ZeroMemory(this->m_hash, HashHelper_HashSize);
@@ -53,4 +46,17 @@ BaseCapture::~BaseCapture()
 		delete this->m_HashHelper;
 	this->m_HashHelper = nullptr;
 #endif // HashHelper_HashSize
+}
+
+BOOL BaseCapture_Render(BaseCapture* pBaseCapture, IDXGISurface* surface, bool isNewSurface, bool& isNewtargetView)
+{
+	if (!pBaseCapture)
+		return FALSE;
+	return pBaseCapture->Render(surface, isNewSurface, isNewtargetView);
+}
+BOOL BaseCapture_CaptureImage(BaseCapture* pBaseCapture, void* data, UINT32 width, UINT32 height, UINT32 lineSize)
+{
+	if (!pBaseCapture)
+		return FALSE;
+	return pBaseCapture->CaptureImage(data, width, height, lineSize);
 }
