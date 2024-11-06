@@ -10,9 +10,25 @@
         Loaded="Window_Loaded"
         SizeChanged="Window_SizeChanged" Background="Black"
         Title="MainWindow" Height="450" Width="800" WindowStartupLocation="CenterScreen">
-    <Grid>
-        <st:StackPanel Orientation="Horizontal">
-            <st:StackPanel VerticalAlignment="Top" HorizontalAlignment="Left" Orientation="Vertical" Width="70">
+    <Window.DataContext>
+        <local:MainWVM/>
+    </Window.DataContext>
+    <st:StackPanel Orientation="Vertical">
+        <st:StackPanel Orientation="Horizontal" st:StackPanel.Fill="Fill">
+            <st:StackPanel VerticalAlignment="Top" HorizontalAlignment="Left" Orientation="Vertical" Width="150" MarginBetweenChildren="5">
+                <Button Content="Refresh" Command="{Binding RefreshWindowCommand}"/>
+                <ComboBox x:Name="cbb_windows" 
+                          ItemsSource="{Binding Windows}" 
+                          SelectedItem="{Binding WindowHelperSelected}" 
+                          DisplayMemberPath="Title" 
+                          SelectionChanged="cbb_windows_SelectionChanged"
+                          />
+                <ComboBox x:Name="cbb_renderMode" 
+                          ItemsSource="{Binding CaptureTypes}" 
+                          SelectedItem="{Binding RenderSelected}" 
+                          SelectionChanged="cbb_renderMode_SelectionChanged"
+                          />
+                
                 <TextBlock x:Name="tb_drawTime" Background="White" Foreground="Black" Padding="5"/>
                 <TextBlock x:Name="tb_fps" Background="White" Foreground="Black" Padding="5"/>
             </st:StackPanel>
@@ -23,5 +39,20 @@
                 </Image.Source>
             </Image>
         </st:StackPanel>
-    </Grid>
+        
+        <Border Height="1" HorizontalAlignment="Stretch" Background="White"/>
+        
+        <st:StackPanel Orientation="Horizontal" st:StackPanel.Fill="Fill">
+            <st:StackPanel VerticalAlignment="Top" HorizontalAlignment="Left" Orientation="Vertical" Width="150" MarginBetweenChildren="5">
+                <ComboBox x:Name="cbb_captureMode" 
+                          ItemsSource="{Binding CaptureTypes}" 
+                          SelectedItem="{Binding CaptureImageSelected}" 
+                          SelectionChanged="cbb_captureMode_SelectionChanged"
+                          />
+                <Button Content="ScreenShoot" x:Name="btn_sceenshoot" Click="btn_sceenshoot_Click"/>
+            </st:StackPanel>
+
+            <Image st:StackPanel.Fill="Fill" Source="{Binding CapturedImage}" Stretch="Uniform"/>
+        </st:StackPanel>
+    </st:StackPanel>
 </Window>

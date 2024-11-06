@@ -10,8 +10,9 @@
 
   <ItemGroup>
     <PackageReference Include="TqkLibrary.AutoGrid" Version="1.2.29" />
-    <PackageReference Include="TqkLibrary.WinApi" Version="1.0.0-build20240616164353" />
+    <PackageReference Include="TqkLibrary.WinApi" Version="1.0.0-build20240905181507" />
     <PackageReference Include="TqkLibrary.Wpf.Interop.DirectX" Version="1.0.1" />
+    <PackageReference Include="TqkLibrary.WpfUi" Version="1.0.0-build20240713143653" />
   </ItemGroup>
 
   <ItemGroup>

@@ -33,7 +33,7 @@ WinrtGraphicCapture::WinrtGraphicCapture()
 WinrtGraphicCapture::~WinrtGraphicCapture()
 {
 	Close();
-	_cpuCaptureTexture.Reset();
+	_tmpFrame.Reset();
 }
 BOOL WinrtGraphicCapture::Init()
 {
@@ -61,6 +61,9 @@ BOOL WinrtGraphicCapture::InitCapture(HWND hwnd)
 	//clean old
 	Close();
 
+
+	_mtx_lockInstance.lock();
+
 	//create new
 	auto activation_factory = winrt::get_activation_factory<winrt::Windows::Graphics::Capture::GraphicsCaptureItem>();
 	auto interop_factory = activation_factory.as<IGraphicsCaptureItemInterop>();
@@ -73,62 +76,29 @@ BOOL WinrtGraphicCapture::InitCapture(HWND hwnd)
 
 	m_lastSize = m_item.Size();
 
-	m_framePool = winrt::Windows::Graphics::Capture::Direct3D11CaptureFramePool::Create(
+	m_framePool = winrt::Windows::Graphics::Capture::Direct3D11CaptureFramePool::CreateFreeThreaded(
 		m_direct3d_device,
 		winrt::Windows::Graphics::DirectX::DirectXPixelFormat::B8G8R8A8UIntNormalized,
 		2,
 		m_lastSize);//not work with D3D11_CREATE_DEVICE_SINGLETHREADED
 	m_session = m_framePool.CreateCaptureSession(m_item);
+	m_frameArrived = m_framePool.FrameArrived(winrt::auto_revoke, { this, &WinrtGraphicCapture::OnFrameArrived });
 	m_session.StartCapture();
+
+	_isCapturing = TRUE;
+	_mtx_lockInstance.unlock();
 
 	return TRUE;
 }
 
-BOOL WinrtGraphicCapture::Render(IDXGISurface* surface, bool isNewSurface, bool& isNewtargetView)
+VOID WinrtGraphicCapture::OnFrameArrived(
+	winrt::Windows::Graphics::Capture::Direct3D11CaptureFramePool const& sender,
+	winrt::Windows::Foundation::IInspectable const&)
 {
-	BOOL result = _renderToSurface.InitializeSurface(surface, isNewSurface, isNewtargetView);
-	auto frame = m_framePool.TryGetNextFrame();
-	if (frame != NULL)
+	_mtx_lockInstance.lock();
+	if (_isCapturing)
 	{
-		auto newSize = false;
-		auto frameContentSize = frame.ContentSize();
-		if (frameContentSize.Width != m_lastSize.Width ||
-			frameContentSize.Height != m_lastSize.Height)
-		{
-			// The thing we have been capturing has changed size.
-			// We need to resize our swap chain first, then blit the pixels.
-			// After we do that, retire the frame and then recreate our frame pool.
-			newSize = true;
-			m_lastSize = frameContentSize;
-		}
-
-
-		auto frameSurface = GetDXGIInterfaceFromObject<ID3D11Texture2D>(frame.Surface());
-
-		result = _renderToSurface.RenderTexture(frameSurface.get());
-
-		if (newSize)
-		{
-			m_framePool.Recreate(
-				m_direct3d_device,
-				winrt::Windows::Graphics::DirectX::DirectXPixelFormat::B8G8R8A8UIntNormalized,
-				2,
-				m_lastSize);
-		}
-	}
-	else if (isNewSurface || isNewtargetView)
-	{
-		result = _renderToSurface.RenderTexture(nullptr);//render old frame
-	}
-
-	return result;
-}
-
-BOOL WinrtGraphicCapture::CaptureImage(void* data, UINT32 width, UINT32 height, UINT32 linesize)
-{
-	auto frame = m_framePool.TryGetNextFrame();
-	if (frame != NULL)
-	{
+		auto frame = m_framePool.TryGetNextFrame();
 		auto newSize = false;
 		auto frameContentSize = frame.ContentSize();
 		if (frameContentSize.Width != m_lastSize.Width ||
@@ -143,17 +113,22 @@ BOOL WinrtGraphicCapture::CaptureImage(void* data, UINT32 width, UINT32 height, 
 
 		auto frameSurface = GetDXGIInterfaceFromObject<ID3D11Texture2D>(frame.Surface());
 
+		//copy frame to cache
 		ComPtr<ID3D11Device> d3dDevice = this->_renderToSurface.GetDevive();
 		ComPtr<ID3D11DeviceContext> d3dDeviceCtx = this->_renderToSurface.GetDeviceContext();
 
+		HRESULT hr{ S_OK };
 		bool isRecreate = false;
 		D3D11_TEXTURE2D_DESC desc;
-		isRecreate = !_cpuCaptureTexture.Get();
+		isRecreate = !_tmpFrame.Get();
 		if (!isRecreate)
 		{
-			_cpuCaptureTexture->GetDesc(&desc);
+			_tmpFrame->GetDesc(&desc);
 			isRecreate = desc.Width != m_lastSize.Width || desc.Height != m_lastSize.Height;
 		}
+
+		//_mtx_lockFrame.lock();
+
 		if (isRecreate)
 		{
 			frameSurface->GetDesc(&desc);
@@ -163,15 +138,22 @@ BOOL WinrtGraphicCapture::CaptureImage(void* data, UINT32 width, UINT32 height, 
 			desc.ArraySize = 1;
 			desc.Format = DXGI_FORMAT::DXGI_FORMAT_B8G8R8A8_UNORM;
 			desc.SampleDesc.Count = 1;
-			desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;//0
-			desc.Usage = D3D11_USAGE_DYNAMIC;// D3D11_USAGE_DEFAULT;
+			desc.BindFlags = 0;//D3D11_BIND_FLAG
+			desc.Usage = D3D11_USAGE::D3D11_USAGE_STAGING;
 			desc.MiscFlags = 0;
-			desc.CPUAccessFlags = D3D10_CPU_ACCESS_READ;
-			HRESULT hr = d3dDevice->CreateTexture2D(&desc, NULL, _cpuCaptureTexture.ReleaseAndGetAddressOf());
-			if (FAILED(hr))
-				return FALSE;
+			desc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+			hr = d3dDevice->CreateTexture2D(&desc, NULL, _tmpFrame.ReleaseAndGetAddressOf());
 		}
-		d3dDeviceCtx->CopyResource(_cpuCaptureTexture.Get(), frameSurface.get());
+		if (SUCCEEDED(hr))
+		{
+			d3dDeviceCtx->CopyResource(_tmpFrame.Get(), frameSurface.get());
+			m_lastTime = frame.SystemRelativeTime();
+
+			_renderToSurface.RenderTexture(_tmpFrame.Get());
+			m_RenderedTime = m_lastTime;
+		}
+
+		//_mtx_lockFrame.unlock();
 
 		if (newSize)
 		{
@@ -181,39 +163,103 @@ BOOL WinrtGraphicCapture::CaptureImage(void* data, UINT32 width, UINT32 height, 
 				2,
 				m_lastSize);
 		}
+	}
+	_mtx_lockInstance.unlock();
+}
 
-		D3D11_MAPPED_SUBRESOURCE map;
-		d3dDeviceCtx->Map(_cpuCaptureTexture.Get(), 0, D3D11_MAP::D3D11_MAP_READ, 0, &map);
-
-		if (map.RowPitch == linesize)
+BOOL WinrtGraphicCapture::Render(IDXGISurface* surface, bool isNewSurface, bool& isNewtargetView)
+{
+	BOOL result = FALSE;
+	if (_isCapturing)
+	{
+		result = _renderToSurface.InitializeSurface(surface, isNewSurface, isNewtargetView);
+		if (_tmpFrame.Get() &&
+			m_lastTime != m_RenderedTime
+			)
 		{
-			memcpy(data, map.pData, map.DepthPitch);
+			//_mtx_lockFrame.lock();
+
+			//result = _renderToSurface.RenderTexture(_tmpFrame.Get());
+			//m_RenderedTime = m_lastTime;
+
+			//_mtx_lockFrame.unlock();
+		}
+		else if (isNewSurface || isNewtargetView)
+		{
+			result = _renderToSurface.RenderTexture(nullptr);//render old frame
 		}
 		else
 		{
-			int row = min(map.RowPitch, linesize);
-			for (int i = 0; i < height; i++)
-			{
-				memcpy(
-					(void*)((UINT64)data + linesize * i),
-					(void*)((UINT64)map.pData + map.RowPitch * i),
-					row
-				);
-			}
+			result = FALSE;
 		}
-		d3dDeviceCtx->Unmap(_cpuCaptureTexture.Get(), 0);
 	}
-	return FALSE;
+	return result;
+}
+
+BOOL WinrtGraphicCapture::CaptureImage(void* data, UINT32 width, UINT32 height, UINT32 linesize)
+{
+	//_mtx_lockFrame.lock();
+	BOOL result = FALSE;
+
+	D3D11_TEXTURE2D_DESC desc;
+	ZeroMemory(&desc,sizeof(D3D11_TEXTURE2D_DESC));	
+	if (_tmpFrame.Get())
+		_tmpFrame->GetDesc(&desc);
+	if (_tmpFrame.Get() &&
+		data &&
+		width > 0 && height > 0 &&
+		desc.Width == width && desc.Height == height)
+	{
+		ComPtr<ID3D11Device> d3dDevice = this->_renderToSurface.GetDevive();
+		ComPtr<ID3D11DeviceContext> d3dDeviceCtx = this->_renderToSurface.GetDeviceContext();
+		D3D11_MAPPED_SUBRESOURCE map;
+		HRESULT hr = d3dDeviceCtx->Map(_tmpFrame.Get(), 0, D3D11_MAP::D3D11_MAP_READ, 0, &map);
+		if (SUCCEEDED(hr))
+		{
+			if (map.RowPitch == linesize)
+			{
+				memcpy(data, map.pData, map.DepthPitch);
+			}
+			else
+			{
+				int row = min(map.RowPitch, linesize);
+				for (int i = 0; i < height; i++)
+				{
+					memcpy(
+						(void*)((UINT64)data + linesize * i),
+						(void*)((UINT64)map.pData + map.RowPitch * i),
+						row
+					);
+				}
+			}
+
+			d3dDeviceCtx->Unmap(_tmpFrame.Get(), 0);
+			result = TRUE;
+		}
+	}
+	//_mtx_lockFrame.unlock();
+	return result;
 }
 
 VOID WinrtGraphicCapture::Close()
 {
-	if (m_framePool) m_framePool.Close();
-	if (m_session) m_session.Close();
+	_mtx_lockInstance.lock();
 
-	m_framePool = nullptr;
-	m_session = nullptr;
-	m_item = nullptr;
+	if (_isCapturing)
+	{
+		//if (m_frameArrived) 
+		m_frameArrived.revoke();
+		if (m_framePool) m_framePool.Close();
+		if (m_session) m_session.Close();
+
+		m_framePool = nullptr;
+		m_session = nullptr;
+		m_item = nullptr;
+		//m_frameArrived = nullptr;
+	}
+	_isCapturing = FALSE;
+
+	_mtx_lockInstance.unlock();
 }
 
 BOOL WinrtGraphicCapture::GetSize(UINT32& width, UINT32& height)

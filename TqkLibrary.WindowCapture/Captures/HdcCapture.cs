@@ -40,10 +40,10 @@ namespace TqkLibrary.WindowCapture.Captures
             set { HdcCapture_SetMode(this.Pointer, value); }
         }
 
-        public override Bitmap? CaptureImage()
+        public override Task<Bitmap?> CaptureImageAsync()
         {
             Size size = Size;
-            if (size.Width <= 0 || size.Height <= 0) return null;
+            if (size.Width <= 0 || size.Height <= 0) return Task.FromResult<Bitmap?>(null);
 
             Bitmap bitmap = new Bitmap(size.Width, size.Height);
             BitmapData bitmapData = bitmap.LockBits(new Rectangle(0, 0, size.Width, size.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppRgb);
@@ -60,12 +60,12 @@ namespace TqkLibrary.WindowCapture.Captures
 
             if (result)
             {
-                return bitmap;
+                return Task.FromResult<Bitmap?>(bitmap);
             }
             else
             {
                 bitmap.Dispose();
-                return null;
+                return Task.FromResult<Bitmap?>(null);
             }
         }
     }

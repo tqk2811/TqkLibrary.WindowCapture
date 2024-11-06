@@ -11,8 +11,7 @@ RenderTextureSurfaceClass::~RenderTextureSurfaceClass() {
 
 
 bool RenderTextureSurfaceClass::Initialize(ID3D11Device* device, IUnknown* surface, bool isNewSurface, bool& isNewtargetView) {
-	assert(device != nullptr);
-	if (surface == nullptr)
+	if (surface == nullptr || device == nullptr)
 		return false;
 
 	if (isNewSurface || m_pRenderTargetView == nullptr)

@@ -43,6 +43,9 @@ BOOL HdcCapture::InitCapture(HWND hWnd)
 	if (!this->_hdc)
 		return FALSE;
 
+	if (!_renderToSurface.Init())
+		return FALSE;
+
 	if (!hWnd || hWnd == INVALID_HANDLE_VALUE)
 		return FALSE;
 	this->m_hWnd = hWnd;
@@ -75,22 +78,32 @@ BOOL HdcCapture::InitCapture(HWND hWnd)
 
 BOOL HdcCapture::Render(IDXGISurface* surface, bool isNewSurface, bool& isNewtargetView)
 {
-//	HBITMAP hBitmap = CaptureToHBitmap(this->_mode);
-//	if (!hBitmap || hBitmap == INVALID_HANDLE_VALUE)
-//		return FALSE;
-// 
-//	ComPtr<ID3D11Device> device;
-//	ComPtr<ID3D11DeviceContext> deviceCtx;
-//	ComPtr<ID3D11Texture2D> texture;
-//
-//	BOOL result = CopyBitmapToTexture(hBitmap, this->_hdc, device.Get(), deviceCtx.Get(), texture
-//#ifdef HashHelper_Enable
-//		, m_HashHelper, this->m_hash
-//#endif
-//	);
-//	DeleteObject(hBitmap);
+	BOOL result = _renderToSurface.InitializeSurface(surface, isNewSurface, isNewtargetView);
 
-	return FALSE;
+	BITMAP bitmap{};
+	HBITMAP hBitmap = CaptureToHBitmap(this->_mode);
+	if (!hBitmap || hBitmap == INVALID_HANDLE_VALUE)
+		return FALSE;
+
+	HGDIOBJ obj = SelectObject(this->_hdc, hBitmap);
+	result = GetObject(hBitmap, sizeof(BITMAP), &bitmap) == sizeof(BITMAP);
+	if (result)
+	{
+		ComPtr<ID3D11Device> device = _renderToSurface.GetDevive();
+		ComPtr<ID3D11DeviceContext> deviceCtx = _renderToSurface.GetDeviceContext();
+
+		result = CopyBitmapToTexture(hBitmap, this->_hdc, device.Get(), deviceCtx.Get(), _renderTexture
+#ifdef HashHelper_Enable
+			, m_HashHelper, this->m_hash
+#endif
+		);
+		if (result)
+			result = _renderToSurface.RenderTexture(_renderTexture.Get());
+
+		DeleteObject(hBitmap);
+	}
+
+	return result;
 }
 BOOL HdcCapture::CaptureImage(void* data, UINT32 width, UINT32 height, UINT32 linesize)
 {
@@ -217,7 +230,7 @@ HBITMAP HdcCapture::CaptureToHBitmap(HdcCaptureMode mode)
 		width = rcClient.right - rcClient.left;
 		height = rcClient.bottom - rcClient.top;
 #endif
-}
+	}
 
 	hdcDest = CreateCompatibleDC(hdcSource);
 	if (!hdcDest)
@@ -352,7 +365,7 @@ BOOL HdcCapture::CopyBitmapToTexture(
 		{
 			goto end;
 		}
-}
+	}
 #endif // #ifdef HashHelper_HashSize
 
 	{

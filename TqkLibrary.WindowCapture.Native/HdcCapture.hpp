@@ -8,6 +8,7 @@
 #include "Directx.hpp"
 #include "Gdi.hpp"
 #include "HashHelper.hpp"
+#include "RenderToSurface.hpp"
 
 enum HdcCaptureMode: BYTE
 {
@@ -31,6 +32,8 @@ public:
 private:
 	HDC _hdc{ 0 };
 	HdcCaptureMode _mode{ HdcCaptureMode_BitBlt };
+	RenderToSurface _renderToSurface;
+	ComPtr<ID3D11Texture2D> _renderTexture{ NULL };
 
 	HBITMAP CaptureToHBitmap(HdcCaptureMode mode);
 
