@@ -14,23 +14,23 @@ namespace TqkLibrary.WindowCapture
     {
 
         [DllImport(_dllName, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void BaseCapture_Free(ref IntPtr pointer);
+        protected static extern void BaseCapture_Free(ref IntPtr pointer);
 
 
         [DllImport(_dllName, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
-        public static extern bool BaseCapture_InitCapture(IntPtr pointer, IntPtr hwnd);
+        protected static extern bool BaseCapture_InitCapture(IntPtr pointer, IntPtr hwnd);
 
 
         [DllImport(_dllName, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
-        public static extern bool BaseCapture_GetSize(IntPtr pointer, ref UInt32 width, ref UInt32 height);
+        protected static extern bool BaseCapture_GetSize(IntPtr pointer, ref UInt32 width, ref UInt32 height);
 
 
         [DllImport(_dllName, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
-        public static extern bool BaseCapture_CaptureImage(IntPtr pointer, IntPtr data, UInt32 width, UInt32 height, UInt32 lineSize);
+        protected static extern bool BaseCapture_CaptureImage(IntPtr pointer, IntPtr data, UInt32 width, UInt32 height, UInt32 lineSize);
 
 
         [DllImport(_dllName, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
-        public static extern bool BaseCapture_Render(IntPtr pointer, IntPtr surface, bool isNewSurface, ref bool isNewtargetView);
+        protected static extern bool BaseCapture_Render(IntPtr pointer, IntPtr surface, bool isNewSurface, ref bool isNewtargetView);
 
 
 

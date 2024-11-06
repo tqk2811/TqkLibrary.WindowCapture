@@ -20,13 +20,13 @@ namespace TqkLibrary.WindowCapture.Captures
 
 
         [DllImport(_dllName, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr HdcCapture_Alloc();
+        static extern IntPtr HdcCapture_Alloc();
 
         [DllImport(_dllName, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
-        public static extern HdcCaptureMode HdcCapture_GetMode(IntPtr pointer);
+        static extern HdcCaptureMode HdcCapture_GetMode(IntPtr pointer);
 
         [DllImport(_dllName, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void HdcCapture_SetMode(IntPtr pointer, HdcCaptureMode mode);
+        static extern void HdcCapture_SetMode(IntPtr pointer, HdcCaptureMode mode);
 
 
         public HdcCapture() : base(HdcCapture_Alloc())
