@@ -58,7 +58,7 @@ namespace TqkLibrary.WindowCapture
 
         public abstract Task<Bitmap?> CaptureImageAsync();
 
-        public bool Render(IntPtr surface, bool isNewSurface, ref bool isNewtargetView)
+        public virtual bool Render(IntPtr surface, bool isNewSurface, ref bool isNewtargetView)
             => BaseCapture_Render(Pointer, surface, isNewSurface, ref isNewtargetView);
     }
 }

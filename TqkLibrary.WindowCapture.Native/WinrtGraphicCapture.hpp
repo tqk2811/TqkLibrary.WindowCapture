@@ -20,17 +20,22 @@
 #include <Windows.Graphics.Capture.Interop.h>
 #include <mutex>
 
-class WinrtGraphicCapture: public BaseCapture
+class WinrtGraphicCapture : public BaseCapture
 {
 public:
 	WinrtGraphicCapture();
 	~WinrtGraphicCapture();
+
+	INT32 GetDelay();
+	VOID SetDelay(INT32 delay);
 
 	// BaseCapture
 	BOOL InitCapture(HWND hwnd);
 	BOOL GetSize(UINT32& width, UINT32& height);
 	BOOL CaptureImage(void* data, UINT32 width, UINT32 height, UINT32 linesize);
 	BOOL Render(IDXGISurface* surface, bool isNewSurface, bool& isNewtargetView);
+
+
 
 private:
 	VOID OnFrameArrived(
@@ -42,7 +47,7 @@ private:
 	RenderToSurface _renderToSurface;
 	winrt::Windows::Graphics::DirectX::Direct3D11::IDirect3DDevice m_direct3d_device{ nullptr };
 
-
+	
 	winrt::Windows::Graphics::SizeInt32 m_lastSize{ NULL };
 	winrt::Windows::Foundation::TimeSpan m_lastTime{ NULL };
 	winrt::Windows::Foundation::TimeSpan m_RenderedTime{ NULL };
@@ -53,13 +58,16 @@ private:
 	winrt::Windows::Graphics::Capture::Direct3D11CaptureFramePool::FrameArrived_revoker m_frameArrived;
 
 	BOOL _isCapturing = FALSE;
-	std::mutex _mtx_lockInstance;
-	std::mutex _mtx_lockFrame;
+	std::recursive_mutex _mtx_lockInstance;
+	std::recursive_mutex _mtx_lockFrame;
 
+	UINT32 m_delay{ 0 };
 	ComPtr<ID3D11Texture2D> _tmpFrame{ nullptr };
 };
 
 TqkLibrary_WindowCapture_Export WinrtGraphicCapture* WinrtGraphicCapture_Alloc();
+TqkLibrary_WindowCapture_Export INT32 WinrtGraphicCapture_GetDelay(WinrtGraphicCapture* p);
+TqkLibrary_WindowCapture_Export VOID WinrtGraphicCapture_SetDelay(WinrtGraphicCapture* p, INT32 delay);
 
 
 #endif // !_WindowCapture_H_WinrtGraphicCapture_H_

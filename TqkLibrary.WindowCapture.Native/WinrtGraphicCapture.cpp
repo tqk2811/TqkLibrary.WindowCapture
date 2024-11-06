@@ -1,5 +1,6 @@
 #include "WinrtGraphicCapture.hpp"
 
+#define FramePool_NUMBER_BUFFER 1
 extern "C"
 {
 	HRESULT __stdcall CreateDirect3D11DeviceFromDXGIDevice(::IDXGIDevice* dxgiDevice,
@@ -25,6 +26,17 @@ WinrtGraphicCapture* WinrtGraphicCapture_Alloc()
 {
 	return new WinrtGraphicCapture();
 }
+INT32 WinrtGraphicCapture_GetDelay(WinrtGraphicCapture* p)
+{
+	if (p)
+		return p->GetDelay();
+	return -1;
+}
+VOID WinrtGraphicCapture_SetDelay(WinrtGraphicCapture* p, INT32 delay)
+{
+	if (p)
+		return p->SetDelay(delay);
+}
 
 WinrtGraphicCapture::WinrtGraphicCapture()
 {
@@ -34,6 +46,14 @@ WinrtGraphicCapture::~WinrtGraphicCapture()
 {
 	Close();
 	_tmpFrame.Reset();
+}
+INT32 WinrtGraphicCapture::GetDelay()
+{
+	return m_delay;
+}
+VOID WinrtGraphicCapture::SetDelay(INT32 delay)
+{
+	m_delay = max(delay,0);
 }
 BOOL WinrtGraphicCapture::Init()
 {
@@ -79,7 +99,7 @@ BOOL WinrtGraphicCapture::InitCapture(HWND hwnd)
 	m_framePool = winrt::Windows::Graphics::Capture::Direct3D11CaptureFramePool::CreateFreeThreaded(
 		m_direct3d_device,
 		winrt::Windows::Graphics::DirectX::DirectXPixelFormat::B8G8R8A8UIntNormalized,
-		2,
+		FramePool_NUMBER_BUFFER,
 		m_lastSize);//not work with D3D11_CREATE_DEVICE_SINGLETHREADED
 	m_session = m_framePool.CreateCaptureSession(m_item);
 	m_frameArrived = m_framePool.FrameArrived(winrt::auto_revoke, { this, &WinrtGraphicCapture::OnFrameArrived });
@@ -127,7 +147,7 @@ VOID WinrtGraphicCapture::OnFrameArrived(
 			isRecreate = desc.Width != m_lastSize.Width || desc.Height != m_lastSize.Height;
 		}
 
-		//_mtx_lockFrame.lock();
+		_mtx_lockFrame.lock();
 
 		if (isRecreate)
 		{
@@ -148,21 +168,22 @@ VOID WinrtGraphicCapture::OnFrameArrived(
 		{
 			d3dDeviceCtx->CopyResource(_tmpFrame.Get(), frameSurface.get());
 			m_lastTime = frame.SystemRelativeTime();
-
-			_renderToSurface.RenderTexture(_tmpFrame.Get());
-			m_RenderedTime = m_lastTime;
 		}
 
-		//_mtx_lockFrame.unlock();
+		_mtx_lockFrame.unlock();
 
 		if (newSize)
 		{
 			m_framePool.Recreate(
 				m_direct3d_device,
 				winrt::Windows::Graphics::DirectX::DirectXPixelFormat::B8G8R8A8UIntNormalized,
-				2,
+				FramePool_NUMBER_BUFFER,
 				m_lastSize);
 		}
+
+		Sleep(m_delay);
+
+		frame.Close();
 	}
 	_mtx_lockInstance.unlock();
 }
@@ -177,12 +198,12 @@ BOOL WinrtGraphicCapture::Render(IDXGISurface* surface, bool isNewSurface, bool&
 			m_lastTime != m_RenderedTime
 			)
 		{
-			//_mtx_lockFrame.lock();
+			_mtx_lockFrame.lock();
 
-			//result = _renderToSurface.RenderTexture(_tmpFrame.Get());
-			//m_RenderedTime = m_lastTime;
+			result = _renderToSurface.RenderTexture(_tmpFrame.Get());
+			m_RenderedTime = m_lastTime;
 
-			//_mtx_lockFrame.unlock();
+			_mtx_lockFrame.unlock();
 		}
 		else if (isNewSurface || isNewtargetView)
 		{
@@ -198,7 +219,7 @@ BOOL WinrtGraphicCapture::Render(IDXGISurface* surface, bool isNewSurface, bool&
 
 BOOL WinrtGraphicCapture::CaptureImage(void* data, UINT32 width, UINT32 height, UINT32 linesize)
 {
-	//_mtx_lockFrame.lock();
+	_mtx_lockFrame.lock();
 	BOOL result = FALSE;
 
 	D3D11_TEXTURE2D_DESC desc;
@@ -237,7 +258,7 @@ BOOL WinrtGraphicCapture::CaptureImage(void* data, UINT32 width, UINT32 height, 
 			result = TRUE;
 		}
 	}
-	//_mtx_lockFrame.unlock();
+	_mtx_lockFrame.unlock();
 	return result;
 }
 

@@ -210,7 +210,7 @@ namespace WpfTest
                     return new HdcCapture() { Mode = HdcCapture.HdcCaptureMode.PrintWindow };
 
                 case CaptureType.WinrtGraphicCapture:
-                    return new WinrtGraphicCapture();
+                    return new WinrtGraphicCapture() { MaxFps = 60 };
 
                 default: throw new NotImplementedException();
             }

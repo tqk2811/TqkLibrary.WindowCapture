@@ -14,9 +14,32 @@ namespace TqkLibrary.WindowCapture.Captures
         [DllImport(_dllName, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr WinrtGraphicCapture_Alloc();
 
+
+        [DllImport(_dllName, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
+        public static extern Int32 WinrtGraphicCapture_GetDelay(IntPtr pointer);
+
+        [DllImport(_dllName, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void WinrtGraphicCapture_SetDelay(IntPtr pointer, Int32 delay);
+
         public WinrtGraphicCapture() : base(WinrtGraphicCapture_Alloc())
         {
 
+        }
+
+        /// <summary>
+        /// 0 is no limit
+        /// </summary>
+        public int MaxFps
+        {
+            get { return WinrtGraphicCapture_GetDelay(Pointer); }
+            set
+            {
+                if (value <= 0) WinrtGraphicCapture_SetDelay(Pointer, 0);
+                else
+                {
+                    WinrtGraphicCapture_SetDelay(Pointer, (int)(1000.0 / value));
+                }
+            }
         }
 
         public override Task<bool> InitAsync(IntPtr hwnd)
