@@ -51,7 +51,7 @@ BOOL RenderToSurface::InitializeSurface(IUnknown* surface, bool isNewSurface, bo
 
 	return result;
 }
-BOOL RenderToSurface::RenderTexture(ID3D11Texture2D* texture)
+BOOL RenderToSurface::SendTexture(ID3D11Texture2D* texture)
 {
 	ComPtr<ID3D11Device> device = this->_d3d.GetDevice();
 	ComPtr<ID3D11DeviceContext> deviceCtx = this->_d3d.GetDeviceContext();
@@ -67,7 +67,15 @@ BOOL RenderToSurface::RenderTexture(ID3D11Texture2D* texture)
 		result = this->_inputTexture.Copy(deviceCtx.Get(), texture);
 		if (!result)
 			return FALSE;
+
+		return TRUE;
 	}//else re-render with old texture when new surface
+	return TRUE;
+}
+BOOL RenderToSurface::Render()
+{
+	ComPtr<ID3D11DeviceContext> deviceCtx = this->_d3d.GetDeviceContext();
+
 	deviceCtx->ClearState();
 	deviceCtx->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	this->_vertexShader.Set(deviceCtx.Get());

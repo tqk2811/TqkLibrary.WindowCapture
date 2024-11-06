@@ -18,7 +18,8 @@ public:
 	BOOL Init();
 
 	BOOL InitializeSurface(IUnknown* surface, bool isNewSurface, bool& isNewtargetView);
-	BOOL RenderTexture(ID3D11Texture2D* texture);
+	BOOL SendTexture(ID3D11Texture2D* texture);
+	BOOL Render();
 
 
 	ComPtr<ID3D11Device> GetDevive();

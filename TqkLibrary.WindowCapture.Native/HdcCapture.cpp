@@ -98,7 +98,10 @@ BOOL HdcCapture::Render(IDXGISurface* surface, bool isNewSurface, bool& isNewtar
 #endif
 		);
 		if (result)
-			result = _renderToSurface.RenderTexture(_renderTexture.Get());
+			result = _renderToSurface.SendTexture(_renderTexture.Get());
+
+		if (result)
+			result = _renderToSurface.Render();
 
 		DeleteObject(hBitmap);
 	}
