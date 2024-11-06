@@ -31,7 +31,7 @@ namespace TqkLibrary.WindowCapture.Captures
         /// </summary>
         public int MaxFps
         {
-            get { return WinrtGraphicCapture_GetDelay(Pointer); }
+            get { return (int)(1000.0 / WinrtGraphicCapture_GetDelay(Pointer)); }
             set
             {
                 if (value <= 0) WinrtGraphicCapture_SetDelay(Pointer, 0);
