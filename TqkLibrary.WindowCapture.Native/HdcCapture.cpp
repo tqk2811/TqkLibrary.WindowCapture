@@ -52,29 +52,6 @@ BOOL HdcCapture::InitCapture(HWND hWnd)
 
 	return TRUE;
 }
-//BOOL HdcCapture::Draw(ID3D11Device* device, ID3D11DeviceContext* deviceCtx, ComPtr<ID3D11Texture2D>& texture)
-//{
-//	if (!device || !deviceCtx)
-//		return FALSE;
-//
-//	HBITMAP hBitmap = CaptureToHBitmap(this->_mode);
-//	if (!hBitmap || hBitmap == INVALID_HANDLE_VALUE)
-//		return FALSE;
-//
-//	BOOL result = CopyBitmapToTexture(hBitmap, this->_hdc, device, deviceCtx, texture
-//#ifdef HashHelper_Enable
-//		, m_HashHelper, this->m_hash
-//#endif
-//	);
-//
-//	DeleteObject(hBitmap);
-//
-//	return result;
-//}
-//HBITMAP HdcCapture::Shoot()
-//{
-//	return CaptureToHBitmap(this->_mode);
-//}
 
 BOOL HdcCapture::Render(IDXGISurface* surface, bool isNewSurface, bool& isNewtargetView)
 {
