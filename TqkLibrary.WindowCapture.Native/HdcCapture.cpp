@@ -97,14 +97,15 @@ BOOL HdcCapture::Render(IDXGISurface* surface, bool isNewSurface, bool& isNewtar
 			, m_HashHelper, this->m_hash
 #endif
 		);
+
 		if (result)
 			result = _renderToSurface.SendTexture(_renderTexture.Get());
 
 		if (result)
 			result = _renderToSurface.Render();
-
-		DeleteObject(hBitmap);
 	}
+
+	DeleteObject(hBitmap);
 
 	return result;
 }
