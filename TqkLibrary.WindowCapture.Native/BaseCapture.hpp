@@ -11,7 +11,7 @@ class BaseCapture
 {
 public:
 	BaseCapture();
-	~BaseCapture();
+	virtual ~BaseCapture();
 	virtual BOOL InitCapture(HWND hWnd) = 0;
 	virtual BOOL GetSize(UINT32& width, UINT32& height) = 0;
 	virtual BOOL Render(IDXGISurface* surface, bool isNewSurface, bool& isNewtargetView) = 0;
