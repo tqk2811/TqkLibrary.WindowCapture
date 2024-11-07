@@ -374,15 +374,15 @@ BOOL HdcCapture::CopyBitmapToTexture(
 			texDesc.MiscFlags = 0;
 			texDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 			hr = device->CreateTexture2D(&texDesc, NULL, texture.ReleaseAndGetAddressOf());
-			if (FAILED(hr))
+			result = SUCCEEDED(hr);
+			if (!result)
 				goto end;
 		}
 	}
 
 	hr = deviceCtx->Map(texture.Get(), 0, D3D11_MAP::D3D11_MAP_WRITE_DISCARD, 0, &map);
-	if (FAILED(hr))
-		goto end;
-
+	result = SUCCEEDED(hr);
+	if (result)
 	{
 		UINT64 bitmapLineSize = 4 * bitmap.bmWidth;
 		if (map.RowPitch == bitmapLineSize)
@@ -401,9 +401,8 @@ BOOL HdcCapture::CopyBitmapToTexture(
 				);
 			}
 		}
+		deviceCtx->Unmap(texture.Get(), 0);
 	}
-	deviceCtx->Unmap(texture.Get(), 0);
-	result = TRUE;
 
 end:
 	if (pData)
