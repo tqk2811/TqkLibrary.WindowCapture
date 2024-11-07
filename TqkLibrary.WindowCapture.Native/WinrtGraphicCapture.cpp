@@ -283,15 +283,15 @@ VOID WinrtGraphicCapture::Close()
 
 	if (_isCapturing)
 	{
-		//if (m_frameArrived) 
 		m_frameArrived.revoke();
-		if (m_framePool) m_framePool.Close();
-		if (m_session) m_session.Close();
-
-		m_framePool = nullptr;
+		if (m_session)
+			m_session.Close();
 		m_session = nullptr;
 		m_item = nullptr;
-		//m_frameArrived = nullptr;
+
+		if (m_framePool)
+			m_framePool.Close();
+		m_framePool = nullptr;
 	}
 	_isCapturing = FALSE;
 
