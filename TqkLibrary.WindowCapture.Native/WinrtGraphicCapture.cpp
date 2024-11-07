@@ -147,8 +147,7 @@ VOID WinrtGraphicCapture::OnFrameArrived(
 			isRecreate = desc.Width != m_lastSize.Width || desc.Height != m_lastSize.Height;
 		}
 
-		_renderToSurface.SendTexture(frameSurface.get());
-		//_mtx_lockFrame.lock();
+		//_renderToSurface.SendTexture(frameSurface.get());
 
 		if (isRecreate)
 		{
@@ -163,8 +162,14 @@ VOID WinrtGraphicCapture::OnFrameArrived(
 			desc.Usage = D3D11_USAGE::D3D11_USAGE_STAGING;
 			desc.MiscFlags = 0;
 			desc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+			ComPtr<ID3D11Texture2D> tmpFrame;
+			hr = d3dDevice->CreateTexture2D(&desc, NULL, tmpFrame.GetAddressOf());
+
 			_mtx_lockFrame.lock();
-			hr = d3dDevice->CreateTexture2D(&desc, NULL, _tmpFrame.ReleaseAndGetAddressOf());
+
+			_tmpFrame.Reset();
+			_tmpFrame = tmpFrame.Get();
+
 			_mtx_lockFrame.unlock();
 		}
 		if (SUCCEEDED(hr))
@@ -172,8 +177,6 @@ VOID WinrtGraphicCapture::OnFrameArrived(
 			d3dDeviceCtx->CopyResource(_tmpFrame.Get(), frameSurface.get());
 			m_lastTime = frame.SystemRelativeTime();
 		}
-
-		//_mtx_lockFrame.unlock();
 
 		if (newSize)
 		{
@@ -197,18 +200,22 @@ BOOL WinrtGraphicCapture::Render(IDXGISurface* surface, bool isNewSurface, bool&
 	if (_isCapturing)
 	{
 		result = _renderToSurface.InitializeSurface(surface, isNewSurface, isNewtargetView);
-		if (_tmpFrame.Get() &&
-			m_lastTime != m_RenderedTime
+
+		_mtx_lockFrame.lock();
+
+		ComPtr<ID3D11Texture2D> tmpFrame = _tmpFrame.Get();
+		winrt::Windows::Foundation::TimeSpan lastTime = m_lastTime;
+
+		_mtx_lockFrame.unlock();
+
+
+		if (tmpFrame.Get() &&
+			lastTime != m_RenderedTime
 			)
 		{
-			//_mtx_lockFrame.lock();
-
-			//result = _renderToSurface.SendTexture(_tmpFrame.Get());
-			m_RenderedTime = m_lastTime;
-
-			//_mtx_lockFrame.unlock();
-
+			result = _renderToSurface.SendTexture(tmpFrame.Get());
 			result = _renderToSurface.Render();
+			m_RenderedTime = m_lastTime;
 		}
 		else if (isNewSurface || isNewtargetView)
 		{
@@ -225,13 +232,17 @@ BOOL WinrtGraphicCapture::Render(IDXGISurface* surface, bool isNewSurface, bool&
 BOOL WinrtGraphicCapture::CaptureImage(void* data, UINT32 width, UINT32 height, UINT32 linesize)
 {
 	_mtx_lockFrame.lock();
-	BOOL result = FALSE;
 
+	ComPtr<ID3D11Texture2D> tmpFrame = _tmpFrame.Get();
+
+	_mtx_lockFrame.unlock();
+
+	BOOL result = FALSE;
 	D3D11_TEXTURE2D_DESC desc;
 	ZeroMemory(&desc,sizeof(D3D11_TEXTURE2D_DESC));	
-	if (_tmpFrame.Get())
-		_tmpFrame->GetDesc(&desc);
-	if (_tmpFrame.Get() &&
+	if (tmpFrame.Get())
+		tmpFrame->GetDesc(&desc);
+	if (tmpFrame.Get() &&
 		data &&
 		width > 0 && height > 0 &&
 		desc.Width == width && desc.Height == height)
@@ -239,7 +250,7 @@ BOOL WinrtGraphicCapture::CaptureImage(void* data, UINT32 width, UINT32 height, 
 		ComPtr<ID3D11Device> d3dDevice = this->_renderToSurface.GetDevive();
 		ComPtr<ID3D11DeviceContext> d3dDeviceCtx = this->_renderToSurface.GetDeviceContext();
 		D3D11_MAPPED_SUBRESOURCE map;
-		HRESULT hr = d3dDeviceCtx->Map(_tmpFrame.Get(), 0, D3D11_MAP::D3D11_MAP_READ, 0, &map);
+		HRESULT hr = d3dDeviceCtx->Map(tmpFrame.Get(), 0, D3D11_MAP::D3D11_MAP_READ, 0, &map);
 		if (SUCCEEDED(hr))
 		{
 			if (map.RowPitch == linesize)
@@ -259,11 +270,10 @@ BOOL WinrtGraphicCapture::CaptureImage(void* data, UINT32 width, UINT32 height, 
 				}
 			}
 
-			d3dDeviceCtx->Unmap(_tmpFrame.Get(), 0);
+			d3dDeviceCtx->Unmap(tmpFrame.Get(), 0);
 			result = TRUE;
 		}
 	}
-	_mtx_lockFrame.unlock();
 	return result;
 }
 
