@@ -298,6 +298,12 @@ VOID WinrtGraphicCapture::Close()
 	_isCapturing = FALSE;
 
 	_mtx_lockInstance.unlock();
+
+	_mtx_lockFrame.lock();
+
+	_tmpFrame.Reset();
+
+	_mtx_lockFrame.unlock();
 }
 
 BOOL WinrtGraphicCapture::GetSize(UINT32& width, UINT32& height)
