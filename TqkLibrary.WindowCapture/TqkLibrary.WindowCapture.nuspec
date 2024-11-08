@@ -3,7 +3,7 @@
 	<!--https://docs.microsoft.com/en-us/nuget/reference/nuspec-->
 	<metadata>
 		<id>TqkLibrary.WindowCapture</id>
-		<version>1.0.0</version>
+		<version>1.0.1</version>
 		<description>TqkLibrary.WindowCapture</description>
 		<authors>tqk2811</authors>
 		<projectUrl>https://github.com/tqk2811/TqkLibrary.WindowCapture</projectUrl>
