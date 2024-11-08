@@ -18,6 +18,11 @@
 #include <winrt/Windows.Graphics.Capture.h>
 #include <winrt/Windows.Media.Capture.h>
 #include <Windows.Graphics.Capture.Interop.h>
+#ifdef NDEBUG
+//https://github.com/microsoft/STL/releases/tag/vs-2022-17.10
+//#3824 #4000 #4339
+#define _DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR
+#endif
 #include <mutex>
 
 class WinrtGraphicCapture : public BaseCapture
