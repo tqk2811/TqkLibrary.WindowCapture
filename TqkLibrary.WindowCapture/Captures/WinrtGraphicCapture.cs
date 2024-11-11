@@ -63,14 +63,14 @@ namespace TqkLibrary.WindowCapture.Captures
                 if (!IsCaptureCursorToggleSupported)
                     throw new NotSupportedException($"Not support to change Cursor Visibly");
                 bool state = false;
-                WinrtGraphicCapture_GetShowCursorState(Pointer, ref state);
+                Task.Factory.StartNew(() => WinrtGraphicCapture_GetShowCursorState(Pointer, ref state), TaskCreationOptions.LongRunning).Wait();
                 return state;
             }
             set
             {
                 if (!IsCaptureCursorToggleSupported)
                     throw new NotSupportedException($"Not support to change Cursor Visibly");
-                WinrtGraphicCapture_ShowCursor(Pointer, value);
+                Task.Factory.StartNew(() => WinrtGraphicCapture_ShowCursor(Pointer, value), TaskCreationOptions.LongRunning).Wait();
             }
         }
 

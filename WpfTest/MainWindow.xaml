@@ -16,6 +16,12 @@
     <st:StackPanel Orientation="Vertical">
         <st:StackPanel Orientation="Horizontal" st:StackPanel.Fill="Fill">
             <st:StackPanel VerticalAlignment="Top" HorizontalAlignment="Left" Orientation="Vertical" Width="150" MarginBetweenChildren="5">
+                <CheckBox IsChecked="{Binding IsShowCursor}" 
+                          Content="IsShowCursor"
+                          Foreground="White"
+                          ToolTip="Only WinrtGraphicCapture"
+                          ToolTipService.InitialShowDelay="0"
+                          />
                 <Button Content="Refresh" Command="{Binding RefreshWindowCommand}"/>
                 <ComboBox x:Name="cbb_windows" 
                           ItemsSource="{Binding Windows}" 

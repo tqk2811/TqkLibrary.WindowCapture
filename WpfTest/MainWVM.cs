@@ -36,6 +36,12 @@ namespace WpfTest
             set { _CaptureImageSelected = value; NotifyPropertyChange(); }
         }
 
+        bool _IsShowCursor = true;
+        public bool IsShowCursor
+        {
+            get { return _IsShowCursor; }
+            set { _IsShowCursor = value; NotifyPropertyChange(); }
+        }
 
 
 

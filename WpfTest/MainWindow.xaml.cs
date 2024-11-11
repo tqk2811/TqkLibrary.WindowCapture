@@ -31,7 +31,9 @@ namespace WpfTest
         {
             InitializeComponent();
             this._mainWVM = this.DataContext as MainWVM ?? throw new InvalidOperationException();
+            this._mainWVM.PropertyChanged += _mainWVM_PropertyChanged;
         }
+
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
@@ -142,8 +144,8 @@ namespace WpfTest
                 IntPtr intPtr = _mainWVM.WindowHelperSelected.WindowHandle;
                 this.Cursor = Cursors.Wait;
 
-                if (_baseCapture_Render is not null) await _baseCapture_Render.InitAsync(intPtr);
-                if (_baseCapture_Shoot is not null) await _baseCapture_Shoot.InitAsync(intPtr);
+                await InitAsync(_baseCapture_Render, intPtr);
+                await InitAsync(_baseCapture_Shoot, intPtr);
 
                 this.Cursor = null;
             }
@@ -160,7 +162,7 @@ namespace WpfTest
                 IntPtr intPtr = _mainWVM.WindowHelperSelected.WindowHandle;
                 this.Cursor = Cursors.Wait;
 
-                if (_baseCapture_Render is not null) await _baseCapture_Render.InitAsync(intPtr);
+                await InitAsync(_baseCapture_Render, intPtr);
 
                 this.Cursor = null;
             }
@@ -178,7 +180,7 @@ namespace WpfTest
                 IntPtr intPtr = _mainWVM.WindowHelperSelected.WindowHandle;
                 this.Cursor = Cursors.Wait;
 
-                if (_baseCapture_Shoot is not null) await _baseCapture_Shoot.InitAsync(intPtr);
+                await InitAsync(_baseCapture_Shoot, intPtr);
 
                 this.Cursor = null;
             }
@@ -197,22 +199,50 @@ namespace WpfTest
             }
         }
 
+        private void _mainWVM_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (nameof(MainWVM.IsShowCursor).Equals(e.PropertyName))
+            {
+                ChangeIsShowCursor(_baseCapture_Render);
+                ChangeIsShowCursor(_baseCapture_Shoot);
+            }
+        }
 
+        void ChangeIsShowCursor(BaseCapture? baseCapture)
+        {
+            if (baseCapture is WinrtGraphicCapture winrtGraphicCapture)
+            {
+                if (winrtGraphicCapture.IsShowCursor != _mainWVM.IsShowCursor)
+                    winrtGraphicCapture.IsShowCursor = _mainWVM.IsShowCursor;
+            }
+        }
+        async Task InitAsync(BaseCapture? baseCapture, IntPtr hwnd)
+        {
+            if (baseCapture is not null)
+            {
+                await baseCapture.InitAsync(hwnd);
+                if (baseCapture is WinrtGraphicCapture winrtGraphicCapture)
+                {
+                    if (winrtGraphicCapture.IsShowCursor != _mainWVM.IsShowCursor)
+                        winrtGraphicCapture.IsShowCursor = _mainWVM.IsShowCursor;
+                }
+            }
+        }
 
         BaseCapture? CreateCapture(CaptureType? captureType)
         {
             try
             {
-            switch (captureType)
-            {
-                case CaptureType.HdcCapture_BitBlt:
-                    return new HdcCapture() { Mode = HdcCapture.HdcCaptureMode.BitBlt };
+                switch (captureType)
+                {
+                    case CaptureType.HdcCapture_BitBlt:
+                        return new HdcCapture() { Mode = HdcCapture.HdcCaptureMode.BitBlt };
 
-                case CaptureType.HdcCapture_PrintWindow:
-                    return new HdcCapture() { Mode = HdcCapture.HdcCaptureMode.PrintWindow };
+                    case CaptureType.HdcCapture_PrintWindow:
+                        return new HdcCapture() { Mode = HdcCapture.HdcCaptureMode.PrintWindow };
 
-                case CaptureType.WinrtGraphicCapture:
-                    return new WinrtGraphicCapture() { MaxFps = 0 };
+                    case CaptureType.WinrtGraphicCapture:
+                        return new WinrtGraphicCapture() { MaxFps = 0 };
 
                     default: return null;
                 }
