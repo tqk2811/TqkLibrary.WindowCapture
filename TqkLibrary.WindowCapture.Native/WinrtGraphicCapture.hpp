@@ -32,9 +32,6 @@ public:
 	WinrtGraphicCapture();
 	~WinrtGraphicCapture();
 
-	INT32 GetDelay();
-	VOID SetDelay(INT32 delay);
-
 	// BaseCapture
 	BOOL InitCapture(HWND hwnd);
 	BOOL GetSize(UINT32& width, UINT32& height);
@@ -42,7 +39,11 @@ public:
 	BOOL Render(IDXGISurface* surface, bool isNewSurface, bool& isNewtargetView);
 	BOOL IsSupported();
 
-
+	//WinrtGraphicCapture
+	INT32 GetDelay();
+	VOID SetDelay(INT32 delay);
+	BOOL ShowCursor(BOOL isVisible);
+	BOOL GetShowCursorState(BOOL& state);
 
 private:
 	VOID OnFrameArrived(
@@ -75,7 +76,9 @@ private:
 TqkLibrary_WindowCapture_Export WinrtGraphicCapture* WinrtGraphicCapture_Alloc();
 TqkLibrary_WindowCapture_Export INT32 WinrtGraphicCapture_GetDelay(WinrtGraphicCapture* p);
 TqkLibrary_WindowCapture_Export VOID WinrtGraphicCapture_SetDelay(WinrtGraphicCapture* p, INT32 delay);
-
+TqkLibrary_WindowCapture_Export BOOL WinrtGraphicCapture_IsCaptureCursorToggleSupported();
+TqkLibrary_WindowCapture_Export BOOL WinrtGraphicCapture_ShowCursor(WinrtGraphicCapture* p, BOOL isVisible);
+TqkLibrary_WindowCapture_Export BOOL WinrtGraphicCapture_GetShowCursorState(WinrtGraphicCapture* p, BOOL& state);
 
 #endif // !_WindowCapture_H_WinrtGraphicCapture_H_
 

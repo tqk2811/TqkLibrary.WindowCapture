@@ -14,14 +14,23 @@ namespace TqkLibrary.WindowCapture.Captures
         [DllImport(_dllName, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
         static extern IntPtr WinrtGraphicCapture_Alloc();
 
-
         [DllImport(_dllName, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
         static extern Int32 WinrtGraphicCapture_GetDelay(IntPtr pointer);
 
         [DllImport(_dllName, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
         static extern void WinrtGraphicCapture_SetDelay(IntPtr pointer, Int32 delay);
 
+        [DllImport(_dllName, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
+        static extern bool WinrtGraphicCapture_IsCaptureCursorToggleSupported();
 
+        [DllImport(_dllName, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
+        static extern bool WinrtGraphicCapture_ShowCursor(IntPtr pointer, bool isVisible);
+
+        [DllImport(_dllName, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
+        static extern bool WinrtGraphicCapture_GetShowCursorState(IntPtr pointer, ref bool state);
+
+
+        public static bool IsCaptureCursorToggleSupported { get; } = WinrtGraphicCapture_IsCaptureCursorToggleSupported();
         protected override string _NotSupportedExceptionText => "required Win10 1903 or higher";
         public WinrtGraphicCapture() : base(WinrtGraphicCapture_Alloc())
         {
@@ -45,6 +54,23 @@ namespace TqkLibrary.WindowCapture.Captures
                 {
                     WinrtGraphicCapture_SetDelay(Pointer, (int)(1000.0 / value));
                 }
+            }
+        }
+        public bool IsShowCursor
+        {
+            get
+            {
+                if (!IsCaptureCursorToggleSupported)
+                    throw new NotSupportedException($"Not support to change Cursor Visibly");
+                bool state = false;
+                WinrtGraphicCapture_GetShowCursorState(Pointer, ref state);
+                return state;
+            }
+            set
+            {
+                if (!IsCaptureCursorToggleSupported)
+                    throw new NotSupportedException($"Not support to change Cursor Visibly");
+                WinrtGraphicCapture_ShowCursor(Pointer, value);
             }
         }
 
