@@ -199,8 +199,10 @@ namespace WpfTest
 
 
 
-        BaseCapture CreateCapture(CaptureType? captureType)
+        BaseCapture? CreateCapture(CaptureType? captureType)
         {
+            try
+            {
             switch (captureType)
             {
                 case CaptureType.HdcCapture_BitBlt:
@@ -212,7 +214,12 @@ namespace WpfTest
                 case CaptureType.WinrtGraphicCapture:
                     return new WinrtGraphicCapture() { MaxFps = 0 };
 
-                default: throw new NotImplementedException();
+                    default: return null;
+                }
+            }
+            catch
+            {
+                return null;
             }
         }
     }

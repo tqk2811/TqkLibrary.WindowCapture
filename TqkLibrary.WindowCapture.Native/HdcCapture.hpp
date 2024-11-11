@@ -29,6 +29,8 @@ public:
 	BOOL Render(IDXGISurface* surface, bool isNewSurface, bool& isNewtargetView) ;
 	BOOL CaptureImage(void* data, UINT32 width, UINT32 height, UINT32 linesize);
 	BOOL GetSize(UINT32& width, UINT32& height);
+	BOOL IsSupported() { return TRUE; }
+
 private:
 	HDC _hdc{ 0 };
 	HdcCaptureMode _mode{ HdcCaptureMode_BitBlt };

@@ -26,6 +26,10 @@ namespace TqkLibrary.WindowCapture
 
 
         [DllImport(_dllName, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
+        protected static extern bool BaseCapture_IsSupported(IntPtr pointer);
+
+
+        [DllImport(_dllName, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
         protected static extern bool BaseCapture_CaptureImage(IntPtr pointer, IntPtr data, UInt32 width, UInt32 height, UInt32 lineSize);
 
 
@@ -47,8 +51,15 @@ namespace TqkLibrary.WindowCapture
                 return Size.Empty;
             }
         }
+
+        protected virtual string _NotSupportedExceptionText { get; } = string.Empty;
         protected BaseCapture(IntPtr pointer) : base(pointer, BaseCapture_Free)
         {
+            if (!BaseCapture_IsSupported(pointer))
+            {
+                Dispose();
+                throw new NotSupportedException(_NotSupportedExceptionText);
+            }
         }
 
         public virtual Task<bool> InitAsync(IntPtr hwnd)

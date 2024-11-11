@@ -112,7 +112,13 @@ BOOL WinrtGraphicCapture::InitCapture(HWND hwnd)
 
 	return TRUE;
 }
-
+BOOL WinrtGraphicCapture::IsSupported()
+{
+	return winrt::Windows::Foundation::Metadata::ApiInformation::IsApiContractPresent(
+		L"Windows.Foundation.UniversalApiContract",
+		8
+	);
+}
 VOID WinrtGraphicCapture::OnFrameArrived(
 	winrt::Windows::Graphics::Capture::Direct3D11CaptureFramePool const& sender,
 	winrt::Windows::Foundation::IInspectable const&)

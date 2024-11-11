@@ -16,7 +16,7 @@ public:
 	virtual BOOL GetSize(UINT32& width, UINT32& height) = 0;
 	virtual BOOL Render(IDXGISurface* surface, bool isNewSurface, bool& isNewtargetView) = 0;
 	virtual BOOL CaptureImage(void* data, UINT32 width, UINT32 height, UINT32 linesize) = 0;
-
+	virtual BOOL IsSupported() = 0;
 protected:
 	HWND m_hWnd{ 0 };
 
@@ -32,6 +32,7 @@ TqkLibrary_WindowCapture_Export VOID BaseCapture_Free(BaseCapture** ppBaseCaptur
 
 TqkLibrary_WindowCapture_Export BOOL BaseCapture_InitCapture(BaseCapture* pBaseCapture, HWND hWnd);
 TqkLibrary_WindowCapture_Export BOOL BaseCapture_GetSize(BaseCapture* pBaseCapture, UINT32& width, UINT32& height);
+TqkLibrary_WindowCapture_Export BOOL BaseCapture_IsSupported(BaseCapture* pBaseCapture);
 
 
 TqkLibrary_WindowCapture_Export BOOL BaseCapture_Render(BaseCapture* pBaseCapture, IDXGISurface* surface, bool isNewSurface, bool& isNewtargetView);

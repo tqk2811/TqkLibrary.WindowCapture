@@ -21,6 +21,8 @@ namespace TqkLibrary.WindowCapture.Captures
         [DllImport(_dllName, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
         static extern void WinrtGraphicCapture_SetDelay(IntPtr pointer, Int32 delay);
 
+
+        protected override string _NotSupportedExceptionText => "required Win10 1903 or higher";
         public WinrtGraphicCapture() : base(WinrtGraphicCapture_Alloc())
         {
 

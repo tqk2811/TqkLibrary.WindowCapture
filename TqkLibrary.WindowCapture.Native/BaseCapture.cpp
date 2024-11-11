@@ -26,6 +26,12 @@ BOOL BaseCapture_GetSize(BaseCapture* pBaseCapture, UINT32& width, UINT32& heigh
 	return FALSE;
 
 }
+BOOL BaseCapture_IsSupported(BaseCapture* pBaseCapture)
+{
+	if (pBaseCapture)
+		return pBaseCapture->IsSupported();
+	return FALSE;
+}
 BOOL HBITMAP_Release(HBITMAP hbitmap)
 {
 	return DeleteObject(hbitmap);

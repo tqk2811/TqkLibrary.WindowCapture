@@ -17,6 +17,7 @@
 #include <winrt/Windows.Graphics.DirectX.Direct3D11.h>
 #include <winrt/Windows.Graphics.Capture.h>
 #include <winrt/Windows.Media.Capture.h>
+#include <winrt/Windows.Foundation.Metadata.h>
 #include <Windows.Graphics.Capture.Interop.h>
 #ifdef NDEBUG
 //https://github.com/microsoft/STL/releases/tag/vs-2022-17.10
@@ -39,6 +40,7 @@ public:
 	BOOL GetSize(UINT32& width, UINT32& height);
 	BOOL CaptureImage(void* data, UINT32 width, UINT32 height, UINT32 linesize);
 	BOOL Render(IDXGISurface* surface, bool isNewSurface, bool& isNewtargetView);
+	BOOL IsSupported();
 
 
 
