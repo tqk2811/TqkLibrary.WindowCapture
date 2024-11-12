@@ -46,9 +46,6 @@ TqkLibrary_WindowCapture_Export BOOL BaseCapture_IsSupported(BaseCapture* pBaseC
 TqkLibrary_WindowCapture_Export BOOL BaseCapture_Render(BaseCapture* pBaseCapture, IDXGISurface* surface, bool isNewSurface, bool& isNewtargetView);
 TqkLibrary_WindowCapture_Export BOOL BaseCapture_CaptureImage(BaseCapture* pBaseCapture, void* data, UINT32 width, UINT32 height, UINT32 lineSize);
 
-
-TqkLibrary_WindowCapture_Export BOOL HBITMAP_Release(HBITMAP hbitmap);
-
 #endif
 
 

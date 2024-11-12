@@ -38,10 +38,6 @@ BOOL BaseCapture_IsSupported(BaseCapture* pBaseCapture)
 		return pBaseCapture->IsSupported();
 	return FALSE;
 }
-BOOL HBITMAP_Release(HBITMAP hbitmap)
-{
-	return DeleteObject(hbitmap);
-}
 
 BaseCapture::BaseCapture()
 {
