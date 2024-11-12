@@ -64,8 +64,7 @@ namespace WpfTest
         void _RefreshWindowCommand()
         {
             Windows.Clear();
-            foreach (var item in WindowHelper.AllWindows
-                .Where(x => !string.IsNullOrWhiteSpace(x.Title) && x.IsWindow && x.IsWindowVisible && x.ParentWindow is null))
+            foreach (var item in WindowHelper.AllAltTabWindows)
             {
                 Windows.Add(item);
             }
