@@ -16,11 +16,11 @@
 //
 //}
 //
-//BOOL DesktopDuplicationCapture::InitCapture(HWND hWnd)
+//BOOL DesktopDuplicationCapture::InitCapture(HWND hwnd)
 //{
-//	if (!hWnd)
+//	if (!hwnd)
 //		return FALSE;
-//	this->m_hWnd = hWnd;
+//	this->m_hwnd = hwnd;
 //
 //	return TRUE;
 //}

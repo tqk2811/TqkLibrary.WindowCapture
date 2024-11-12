@@ -12,7 +12,7 @@ class BaseCapture
 public:
 	BaseCapture();
 	virtual ~BaseCapture();
-	virtual BOOL InitWindowCapture(HWND hWnd)
+	virtual BOOL InitWindowCapture(HWND hwnd)
 	{
 		return FALSE;
 	}
@@ -25,10 +25,10 @@ public:
 	virtual BOOL CaptureImage(void* data, UINT32 width, UINT32 height, UINT32 linesize) = 0;
 	virtual BOOL IsSupported() = 0;
 
-	BOOL IsValidWindow(HWND hWnd);
+	BOOL IsValidWindow(HWND hwnd);
 	BOOL IsValidMonitor(HMONITOR HMONITOR);
 protected:
-	HWND m_hWnd{ 0 };
+	HWND m_hwnd{ 0 };
 
 #ifdef HashHelper_Enable
 	HashHelper* m_HashHelper;

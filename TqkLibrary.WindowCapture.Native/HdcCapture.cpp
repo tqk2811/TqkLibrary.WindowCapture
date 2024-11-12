@@ -38,7 +38,7 @@ VOID HdcCapture::SetMode(HdcCaptureMode mode)
 	_mode = mode;
 }
 
-BOOL HdcCapture::InitWindowCapture(HWND hWnd)
+BOOL HdcCapture::InitWindowCapture(HWND hwnd)
 {
 	if (!this->_hdc)
 		return FALSE;
@@ -46,9 +46,9 @@ BOOL HdcCapture::InitWindowCapture(HWND hWnd)
 	if (!_renderToSurface.Init())
 		return FALSE;
 
-	if (!hWnd || hWnd == INVALID_HANDLE_VALUE)
+	if (!hwnd || hwnd == INVALID_HANDLE_VALUE)
 		return FALSE;
-	this->m_hWnd = hWnd;
+	this->m_hwnd = hwnd;
 
 	return TRUE;
 }
@@ -142,7 +142,7 @@ BOOL HdcCapture::GetSize(UINT32& width, UINT32& height)
 	BOOL result = FALSE;
 	HDC hdcSource{ 0 };
 
-	hdcSource = GetDC(this->m_hWnd);
+	hdcSource = GetDC(this->m_hwnd);
 	if (!hdcSource)
 		goto end;
 
@@ -158,7 +158,7 @@ BOOL HdcCapture::GetSize(UINT32& width, UINT32& height)
 	height = srcBitmapHeader.bmHeight;
 #else
 	RECT rcClient;
-	if (!GetClientRect(this->m_hWnd, &rcClient))
+	if (!GetClientRect(this->m_hwnd, &rcClient))
 		goto end;
 
 	width = rcClient.right - rcClient.left;
@@ -168,7 +168,7 @@ BOOL HdcCapture::GetSize(UINT32& width, UINT32& height)
 
 end:
 	if (hdcSource)
-		ReleaseDC(this->m_hWnd, hdcSource);
+		ReleaseDC(this->m_hwnd, hdcSource);
 	return result;
 }
 
@@ -188,7 +188,7 @@ HBITMAP HdcCapture::CaptureToHBitmap(HdcCaptureMode mode)
 	HBITMAP hBitmap{ 0 };
 
 
-	hdcSource = GetDC(this->m_hWnd);
+	hdcSource = GetDC(this->m_hwnd);
 	if (!hdcSource)
 		goto end;
 
@@ -205,7 +205,7 @@ HBITMAP HdcCapture::CaptureToHBitmap(HdcCaptureMode mode)
 		height = srcBitmapHeader.bmHeight;
 #else
 		RECT rcClient;
-		if (!GetClientRect(this->m_hWnd, &rcClient))
+		if (!GetClientRect(this->m_hwnd, &rcClient))
 			goto end;
 
 		width = rcClient.right - rcClient.left;
@@ -236,7 +236,7 @@ HBITMAP HdcCapture::CaptureToHBitmap(HdcCaptureMode mode)
 		break;
 
 	case HdcCaptureMode::HdcCaptureMode_PrintWindow:
-		if (!PrintWindow(this->m_hWnd, hdcDest, 0))
+		if (!PrintWindow(this->m_hwnd, hdcDest, 0))
 			goto end;
 		isSuccess = TRUE;
 		break;
@@ -252,7 +252,7 @@ end:
 	if (hdcDest)
 		DeleteDC(hdcDest);
 	if (hdcSource)
-		ReleaseDC(this->m_hWnd, hdcSource);
+		ReleaseDC(this->m_hwnd, hdcSource);
 	if (isSuccess)
 	{
 		return hBitmap;

@@ -72,6 +72,7 @@ BaseCapture::~BaseCapture()
 }
 
 BOOL BaseCapture::IsValidWindow(HWND hWnd)
+BOOL BaseCapture::IsValidWindow(HWND hwnd)
 {
 	return TRUE;
 }
