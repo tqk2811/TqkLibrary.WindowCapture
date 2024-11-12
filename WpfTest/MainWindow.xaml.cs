@@ -242,7 +242,7 @@ namespace WpfTest
                         return new HdcCapture() { Mode = HdcCapture.HdcCaptureMode.PrintWindow };
 
                     case CaptureType.WinrtGraphicCapture:
-                        return new WinrtGraphicCapture() { MaxFps = 0 };
+                        return new WinrtGraphicCapture() { MaxFps = 0, IsShowCursor = _mainWVM.IsShowCursor, IsShowBorder = _mainWVM.IsShowBorder };
 
                     default: return null;
                 }

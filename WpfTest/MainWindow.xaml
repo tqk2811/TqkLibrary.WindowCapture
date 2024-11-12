@@ -8,7 +8,7 @@
         xmlns:st="http://schemas.spicytaco.io/"
         mc:Ignorable="d"
         Loaded="Window_Loaded"
-        SizeChanged="Window_SizeChanged" Background="Black"
+        SizeChanged="Window_SizeChanged" Background="White"
         Title="MainWindow" Height="450" Width="800" WindowStartupLocation="CenterScreen">
     <Window.DataContext>
         <local:MainWVM/>
@@ -16,12 +16,6 @@
     <st:StackPanel Orientation="Vertical">
         <st:StackPanel Orientation="Horizontal" st:StackPanel.Fill="Fill">
             <st:StackPanel VerticalAlignment="Top" HorizontalAlignment="Left" Orientation="Vertical" Width="150" MarginBetweenChildren="5">
-                <CheckBox IsChecked="{Binding IsShowCursor}" 
-                          Content="IsShowCursor"
-                          Foreground="White"
-                          ToolTip="Only WinrtGraphicCapture"
-                          ToolTipService.InitialShowDelay="0"
-                          />
                 <Button Content="Refresh" Command="{Binding RefreshWindowCommand}"/>
                 <ComboBox x:Name="cbb_windows" 
                           ItemsSource="{Binding Windows}" 
@@ -37,6 +31,17 @@
                 
                 <TextBlock x:Name="tb_drawTime" Background="White" Foreground="Black" Padding="5"/>
                 <TextBlock x:Name="tb_fps" Background="White" Foreground="Black" Padding="5"/>
+                
+                <GroupBox Header="WinrtGraphicCapture">
+                    <st:StackPanel MarginBetweenChildren="5" Orientation="Vertical">
+                        <CheckBox IsChecked="{Binding IsShowCursor}" 
+                                  Content="IsShowCursor"
+                                  />
+                        <CheckBox IsChecked="{Binding IsShowBorder}" 
+                                  Content="IsShowBorder"
+                                  />
+                    </st:StackPanel>
+                </GroupBox>
             </st:StackPanel>
             
             <Image st:StackPanel.Fill="Fill">
