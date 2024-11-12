@@ -22,41 +22,6 @@ auto GetDXGIInterfaceFromObject(winrt::Windows::Foundation::IInspectable const& 
 	return result;
 }
 
-WinrtGraphicCapture* WinrtGraphicCapture_Alloc()
-{
-	return new WinrtGraphicCapture();
-}
-INT32 WinrtGraphicCapture_GetDelay(WinrtGraphicCapture* p)
-{
-	if (p)
-		return p->GetDelay();
-	return -1;
-}
-VOID WinrtGraphicCapture_SetDelay(WinrtGraphicCapture* p, INT32 delay)
-{
-	if (p)
-		return p->SetDelay(delay);
-}
-BOOL WinrtGraphicCapture_IsCaptureCursorToggleSupported()
-{
-	return winrt::Windows::Foundation::Metadata::ApiInformation::IsPropertyPresent(
-		L"Windows.Graphics.Capture.GraphicsCaptureSession",
-		L"IsCursorCaptureEnabled"
-	);
-}
-BOOL WinrtGraphicCapture_ShowCursor(WinrtGraphicCapture* p, BOOL isVisible)
-{
-	if (p)
-		return p->ShowCursor(isVisible);
-	return FALSE;
-}
-BOOL WinrtGraphicCapture_GetShowCursorState(WinrtGraphicCapture* p,BOOL& state)
-{
-	if (p)
-		return p->GetShowCursorState(state);
-	return FALSE;
-}
-
 WinrtGraphicCapture::WinrtGraphicCapture()
 {
 
@@ -72,7 +37,7 @@ INT32 WinrtGraphicCapture::GetDelay()
 }
 VOID WinrtGraphicCapture::SetDelay(INT32 delay)
 {
-	m_delay = max(delay,0);
+	m_delay = max(delay, 0);
 }
 BOOL WinrtGraphicCapture::Init()
 {
@@ -124,6 +89,12 @@ BOOL WinrtGraphicCapture::InitCapture(HWND hwnd)
 		m_lastSize);//not work with D3D11_CREATE_DEVICE_SINGLETHREADED
 	m_session = m_framePool.CreateCaptureSession(m_item);
 	m_frameArrived = m_framePool.FrameArrived(winrt::auto_revoke, { this, &WinrtGraphicCapture::OnFrameArrived });
+
+	if (WinrtGraphicCapture_IsCaptureCursorToggleSupported() && m_isSetCursorState != TRUE)
+		m_session.IsCursorCaptureEnabled(m_isSetCursorState);
+	if (WinrtGraphicCapture_IsBorderToggleSupported() && m_isSetBorderState != TRUE)
+		m_session.IsBorderRequired(m_isSetBorderState);
+
 	m_session.StartCapture();
 
 	_isCapturing = TRUE;
@@ -266,7 +237,7 @@ BOOL WinrtGraphicCapture::CaptureImage(void* data, UINT32 width, UINT32 height, 
 
 	BOOL result = FALSE;
 	D3D11_TEXTURE2D_DESC desc;
-	ZeroMemory(&desc,sizeof(D3D11_TEXTURE2D_DESC));	
+	ZeroMemory(&desc, sizeof(D3D11_TEXTURE2D_DESC));
 	if (tmpFrame.Get())
 		tmpFrame->GetDesc(&desc);
 	if (tmpFrame.Get() &&
@@ -338,7 +309,7 @@ BOOL WinrtGraphicCapture::GetSize(UINT32& width, UINT32& height)
 	return TRUE;
 }
 
-BOOL WinrtGraphicCapture::ShowCursor(BOOL isVisible)
+BOOL WinrtGraphicCapture::SetCursorState(BOOL isVisible)
 {
 	BOOL result = FALSE;
 	_mtx_lockInstance.lock();
@@ -348,11 +319,16 @@ BOOL WinrtGraphicCapture::ShowCursor(BOOL isVisible)
 		m_session.IsCursorCaptureEnabled(isVisible);
 		result = TRUE;
 	}
+	else
+	{
+		m_isSetCursorState = isVisible;
+		result = TRUE;
+	}
 
 	_mtx_lockInstance.unlock();
 	return result;
 }
-BOOL WinrtGraphicCapture::GetShowCursorState(BOOL& state)
+BOOL WinrtGraphicCapture::GetCursorState(BOOL& state)
 {
 	BOOL result = FALSE;
 	_mtx_lockInstance.lock();
@@ -360,9 +336,158 @@ BOOL WinrtGraphicCapture::GetShowCursorState(BOOL& state)
 	if (_isCapturing)
 	{
 		state = m_session.IsCursorCaptureEnabled();
-		result = true;
+		result = TRUE;
+	}
+	else
+	{
+		state = m_isSetCursorState;
+		result = TRUE;
 	}
 
 	_mtx_lockInstance.unlock();
 	return result;
+}
+
+BOOL WinrtGraphicCapture::SetBorderState(BOOL isVisible)
+{
+	BOOL result = FALSE;
+	_mtx_lockInstance.lock();
+
+	if (_isCapturing)
+	{
+		m_session.IsCursorCaptureEnabled(isVisible);
+		result = TRUE;
+	}
+	else
+	{
+		m_isSetBorderState = isVisible;
+		result = TRUE;
+	}
+
+	_mtx_lockInstance.unlock();
+	return result;
+}
+BOOL WinrtGraphicCapture::GetBorderState(BOOL& state)
+{
+	BOOL result = FALSE;
+	_mtx_lockInstance.lock();
+
+	if (_isCapturing)
+	{
+		state = m_session.IsCursorCaptureEnabled();
+		result = TRUE;
+	}
+	else
+	{
+		state = m_isSetBorderState;
+		result = TRUE;
+	}
+
+	_mtx_lockInstance.unlock();
+	return result;
+}
+
+//BOOL WinrtGraphicCapture::GetMinUpdateInterval(BOOL& isVisible)
+//{
+//	BOOL result = FALSE;
+//	_mtx_lockInstance.lock();
+//
+//	if (_isCapturing)
+//	{
+//		m_session.IsCursorCaptureEnabled(isVisible);
+//		result = TRUE;
+//	}
+//	else
+//	{
+//		m_isSetBorderState = isVisible;
+//		result = TRUE;
+//	}
+//
+//	_mtx_lockInstance.unlock();
+//	return result;
+//}
+
+//BOOL WinrtGraphicCapture::SetMinUpdateInterval(BOOL state)
+//{
+//	BOOL result = FALSE;
+//	_mtx_lockInstance.lock();
+//
+//	if (_isCapturing)
+//	{
+//		state = m_session.;
+//		result = TRUE;
+//	}
+//	else
+//	{
+//		state = m_isSetBorderState;
+//		result = TRUE;
+//	}
+//
+//	_mtx_lockInstance.unlock();
+//	return result;
+//}
+
+
+
+
+
+
+
+
+WinrtGraphicCapture* WinrtGraphicCapture_Alloc()
+{
+	return new WinrtGraphicCapture();
+}
+INT32 WinrtGraphicCapture_GetDelay(WinrtGraphicCapture* p)
+{
+	if (p)
+		return p->GetDelay();
+	return -1;
+}
+VOID WinrtGraphicCapture_SetDelay(WinrtGraphicCapture* p, INT32 delay)
+{
+	if (p)
+		return p->SetDelay(delay);
+}
+
+
+BOOL WinrtGraphicCapture_IsCaptureCursorToggleSupported()
+{
+	return winrt::Windows::Foundation::Metadata::ApiInformation::IsPropertyPresent(
+		L"Windows.Graphics.Capture.GraphicsCaptureSession",
+		L"IsCursorCaptureEnabled"
+	);
+}
+BOOL WinrtGraphicCapture_SetCursorState(WinrtGraphicCapture* p, BOOL isVisible)
+{
+	if (p)
+		return p->SetCursorState(isVisible);
+	return FALSE;
+}
+BOOL WinrtGraphicCapture_GetCursorState(WinrtGraphicCapture* p, BOOL& state)
+{
+	if (p)
+		return p->GetCursorState(state);
+	return FALSE;
+}
+
+
+BOOL WinrtGraphicCapture_IsBorderToggleSupported()
+{
+	return winrt::Windows::Foundation::Metadata::ApiInformation::IsPropertyPresent(
+		L"Windows.Graphics.Capture.GraphicsCaptureSession",
+		L"IsBorderRequired"
+	);
+}
+BOOL WinrtGraphicCapture_SetBorderState(WinrtGraphicCapture* p, BOOL isVisible)
+{
+	if (p)
+		return p->SetBorderState(isVisible);
+	return FALSE;
+}
+BOOL WinrtGraphicCapture_GetBorderState(WinrtGraphicCapture* p, BOOL& state)
+{
+	if (p)
+		return p->GetBorderState(state);
+	return FALSE;
 }

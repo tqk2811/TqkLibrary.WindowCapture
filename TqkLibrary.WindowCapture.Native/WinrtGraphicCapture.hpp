@@ -42,8 +42,14 @@ public:
 	//WinrtGraphicCapture
 	INT32 GetDelay();
 	VOID SetDelay(INT32 delay);
-	BOOL ShowCursor(BOOL isVisible);
-	BOOL GetShowCursorState(BOOL& state);
+	BOOL SetCursorState(BOOL isVisible);
+	BOOL GetCursorState(BOOL& state);
+
+	BOOL SetBorderState(BOOL isVisible);
+	BOOL GetBorderState(BOOL& state);
+
+	//BOOL GetMinUpdateInterval(BOOL& isVisible);
+	//BOOL SetMinUpdateInterval(BOOL isVisible);
 
 private:
 	VOID OnFrameArrived(
@@ -71,14 +77,26 @@ private:
 
 	UINT32 m_delay{ 0 };
 	ComPtr<ID3D11Texture2D> _tmpFrame{ nullptr };
+	BOOL m_isSetCursorState{ TRUE };
+	BOOL m_isSetBorderState{ TRUE };
 };
 
 TqkLibrary_WindowCapture_Export WinrtGraphicCapture* WinrtGraphicCapture_Alloc();
 TqkLibrary_WindowCapture_Export INT32 WinrtGraphicCapture_GetDelay(WinrtGraphicCapture* p);
 TqkLibrary_WindowCapture_Export VOID WinrtGraphicCapture_SetDelay(WinrtGraphicCapture* p, INT32 delay);
+
 TqkLibrary_WindowCapture_Export BOOL WinrtGraphicCapture_IsCaptureCursorToggleSupported();
-TqkLibrary_WindowCapture_Export BOOL WinrtGraphicCapture_ShowCursor(WinrtGraphicCapture* p, BOOL isVisible);
-TqkLibrary_WindowCapture_Export BOOL WinrtGraphicCapture_GetShowCursorState(WinrtGraphicCapture* p, BOOL& state);
+TqkLibrary_WindowCapture_Export BOOL WinrtGraphicCapture_SetCursorState(WinrtGraphicCapture* p, BOOL isVisible);
+TqkLibrary_WindowCapture_Export BOOL WinrtGraphicCapture_GetCursorState(WinrtGraphicCapture* p, BOOL& state);
+
+TqkLibrary_WindowCapture_Export BOOL WinrtGraphicCapture_IsBorderToggleSupported();
+TqkLibrary_WindowCapture_Export BOOL WinrtGraphicCapture_SetBorderState(WinrtGraphicCapture* p, BOOL isVisible);
+TqkLibrary_WindowCapture_Export BOOL WinrtGraphicCapture_GetBorderState(WinrtGraphicCapture* p, BOOL& state);
+
+//TqkLibrary_WindowCapture_Export BOOL WinrtGraphicCapture_IsMinUpdateIntervalSupported();
+//TqkLibrary_WindowCapture_Export BOOL WinrtGraphicCapture_SetMinUpdateInterval(WinrtGraphicCapture* p, BOOL isVisible);
+//TqkLibrary_WindowCapture_Export BOOL WinrtGraphicCapture_GetMinUpdateInterval(WinrtGraphicCapture* p, winrt::Windows::System::DispatcherQueueTimer & state);
+
 
 #endif // !_WindowCapture_H_WinrtGraphicCapture_H_
 

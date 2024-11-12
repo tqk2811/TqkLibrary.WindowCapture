@@ -20,18 +20,67 @@ namespace TqkLibrary.WindowCapture.Captures
         [DllImport(_dllName, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
         static extern void WinrtGraphicCapture_SetDelay(IntPtr pointer, Int32 delay);
 
+
+
+
         [DllImport(_dllName, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
         static extern bool WinrtGraphicCapture_IsCaptureCursorToggleSupported();
 
         [DllImport(_dllName, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
-        static extern bool WinrtGraphicCapture_ShowCursor(IntPtr pointer, bool isVisible);
+        static extern bool WinrtGraphicCapture_SetCursorState(IntPtr pointer, bool isVisible);
 
         [DllImport(_dllName, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
-        static extern bool WinrtGraphicCapture_GetShowCursorState(IntPtr pointer, ref bool state);
+        static extern bool WinrtGraphicCapture_GetCursorState(IntPtr pointer, ref bool isVisible);
+
+
+
+        [DllImport(_dllName, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
+        static extern bool WinrtGraphicCapture_IsBorderToggleSupported();
+
+        [DllImport(_dllName, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
+        static extern bool WinrtGraphicCapture_SetBorderState(IntPtr pointer, bool isVisible);
+
+        [DllImport(_dllName, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
+        static extern bool WinrtGraphicCapture_GetBorderState(IntPtr pointer, ref bool isVisible);
+
+
+
+
+        //[DllImport(_dllName, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
+        //static extern bool WinrtGraphicCapture_IsMinUpdateIntervalSupported();
+
+        //[DllImport(_dllName, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
+        //static extern bool WinrtGraphicCapture_SetMinUpdateInterval(IntPtr pointer, TimeSpan timeSpan);
+
+        //[DllImport(_dllName, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
+        //static extern bool WinrtGraphicCapture_GetMinUpdateInterval(IntPtr pointer, ref TimeSpan timeSpan);
 
 
         public static bool IsCaptureCursorToggleSupported { get; } = WinrtGraphicCapture_IsCaptureCursorToggleSupported();
+        public static bool IsBorderToggleSupported { get; } = WinrtGraphicCapture_IsBorderToggleSupported();
+        //public static bool IsMinUpdateIntervalSupported { get; } = WinrtGraphicCapture_IsMinUpdateIntervalSupported();
+
+
+        /*
+https://jrsoftware.org/ishelp/index.php?topic=winvernotes
+10.0.18362	Windows 10 Version 1903 (May 2019 Update)
+10.0.18363	Windows 10 Version 1909 (November 2019 Update)
+10.0.19041	Windows 10 Version 2004 (May 2020 Update)
+10.0.19042	Windows 10 Version 20H2 (October 2020 Update)
+10.0.19043	Windows 10 Version 21H1 (May 2021 Update)
+10.0.19044	Windows 10 Version 21H2 (November 2021 Update)
+10.0.19045	Windows 10 Version 22H2 (2022 Update)
+10.0.20348	Windows Server 2022 Version 21H2
+10.0.22000	Windows 11 Version 21H2 (original release)
+10.0.22621	Windows 11 Version 22H2 (2022 Update)
+10.0.22631	Windows 11 Version 23H2 (2023 Update)
+10.0.26100	Windows 11 Version 24H2 (2024 Update)
+         */
+        const string _Text_IsShowCursor_Error = "Not support to change Cursor Visibly. Required: Windows 10, version 2004 (introduced in 10.0.19041.0)";
+        const string _Text_IsShowBorder_Error = "Not support to change Border Visibly. Required: Windows 10, version 2104 (introduced in 10.0.20348.0)";
         protected override string _NotSupportedExceptionText => "required Win10 1903 or higher";
+
+
         public WinrtGraphicCapture() : base(WinrtGraphicCapture_Alloc())
         {
 
@@ -56,21 +105,54 @@ namespace TqkLibrary.WindowCapture.Captures
                 }
             }
         }
+
+        //public TimeSpan MinUpdateInterval
+        //{
+        //    get
+        //    {
+        //        TimeSpan timeSpan = TimeSpan.Zero;
+        //        Task.Factory.StartNew(() => WinrtGraphicCapture_GetMinUpdateInterval(Pointer, ref timeSpan), TaskCreationOptions.LongRunning).Wait();
+        //        return timeSpan;
+        //    }
+        //    set
+        //    {
+        //        Task.Factory.StartNew(() => WinrtGraphicCapture_SetMinUpdateInterval(Pointer, value), TaskCreationOptions.LongRunning).Wait();
+        //    }
+        //}
+
         public bool IsShowCursor
         {
             get
             {
                 if (!IsCaptureCursorToggleSupported)
-                    throw new NotSupportedException($"Not support to change Cursor Visibly");
-                bool state = false;
-                Task.Factory.StartNew(() => WinrtGraphicCapture_GetShowCursorState(Pointer, ref state), TaskCreationOptions.LongRunning).Wait();
-                return state;
+                    throw new NotSupportedException(_Text_IsShowCursor_Error);
+                bool isVisible = false;
+                Task.Factory.StartNew(() => WinrtGraphicCapture_GetCursorState(Pointer, ref isVisible), TaskCreationOptions.LongRunning).Wait();
+                return isVisible;
             }
             set
             {
                 if (!IsCaptureCursorToggleSupported)
-                    throw new NotSupportedException($"Not support to change Cursor Visibly");
-                Task.Factory.StartNew(() => WinrtGraphicCapture_ShowCursor(Pointer, value), TaskCreationOptions.LongRunning).Wait();
+                    throw new NotSupportedException(_Text_IsShowCursor_Error);
+                Task.Factory.StartNew(() => WinrtGraphicCapture_SetCursorState(Pointer, value), TaskCreationOptions.LongRunning).Wait();
+            }
+        }
+
+        public bool IsShowBorder
+        {
+            get
+            {
+                if (!IsBorderToggleSupported)
+                    throw new NotSupportedException(_Text_IsShowBorder_Error);
+                bool isVisible = false;
+                Task.Factory.StartNew(() => WinrtGraphicCapture_GetBorderState(Pointer, ref isVisible), TaskCreationOptions.LongRunning).Wait();
+                return isVisible;
+            }
+            set
+            {
+                if (!IsBorderToggleSupported)
+                    throw new NotSupportedException(_Text_IsShowBorder_Error);
+                Task.Factory.StartNew(() => WinrtGraphicCapture_SetBorderState(Pointer, value), TaskCreationOptions.LongRunning).Wait();
             }
         }
 
