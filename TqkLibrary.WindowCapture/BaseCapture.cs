@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.Linq;
-using System.Reflection;
+﻿using System.Drawing;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TqkLibrary.WindowCapture
 {
@@ -14,11 +7,15 @@ namespace TqkLibrary.WindowCapture
     {
 
         [DllImport(_dllName, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
-        protected static extern void BaseCapture_Free(ref IntPtr pointer);
+        static extern void BaseCapture_Free(ref IntPtr pointer);
 
 
         [DllImport(_dllName, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
-        protected static extern bool BaseCapture_InitCapture(IntPtr pointer, IntPtr hwnd);
+        protected static extern bool BaseCapture_InitWindowCapture(IntPtr pointer, IntPtr hwnd);
+
+
+        [DllImport(_dllName, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
+        protected static extern bool BaseCapture_InitMonitorCapture(IntPtr pointer, int HMONITOR);
 
 
         [DllImport(_dllName, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
@@ -44,7 +41,7 @@ namespace TqkLibrary.WindowCapture
             {
                 UInt32 width = 0;
                 UInt32 height = 0;
-                if (BaseCapture_GetSize(this.Pointer, ref width, ref height))
+                if (BaseCapture_GetSize(Pointer, ref width, ref height))
                 {
                     return new Size((int)width, (int)height);
                 }
@@ -62,9 +59,13 @@ namespace TqkLibrary.WindowCapture
             }
         }
 
-        public virtual Task<bool> InitAsync(IntPtr hwnd)
+        public virtual Task<bool> InitWindowAsync(IntPtr hwnd)
         {
-            return Task.FromResult(BaseCapture_InitCapture(Pointer, hwnd));
+            return Task.FromResult(BaseCapture_InitWindowCapture(Pointer, hwnd));
+        }
+        public virtual Task<bool> InitMonitorAsync(int HMONITOR)
+        {
+            return Task.FromResult(BaseCapture_InitMonitorCapture(Pointer, HMONITOR));
         }
 
         public abstract Task<Bitmap?> CaptureImageAsync();

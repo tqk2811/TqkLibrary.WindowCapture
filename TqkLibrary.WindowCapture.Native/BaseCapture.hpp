@@ -12,7 +12,14 @@ class BaseCapture
 public:
 	BaseCapture();
 	virtual ~BaseCapture();
-	virtual BOOL InitCapture(HWND hWnd) = 0;
+	virtual BOOL InitWindowCapture(HWND hWnd)
+	{
+		return FALSE;
+	}
+	virtual BOOL InitMonitorCapture(HMONITOR HMONITOR)
+	{
+		return FALSE;
+	}
 	virtual BOOL GetSize(UINT32& width, UINT32& height) = 0;
 	virtual BOOL Render(IDXGISurface* surface, bool isNewSurface, bool& isNewtargetView) = 0;
 	virtual BOOL CaptureImage(void* data, UINT32 width, UINT32 height, UINT32 linesize) = 0;
@@ -30,7 +37,8 @@ protected:
 
 TqkLibrary_WindowCapture_Export VOID BaseCapture_Free(BaseCapture** ppBaseCapture);
 
-TqkLibrary_WindowCapture_Export BOOL BaseCapture_InitCapture(BaseCapture* pBaseCapture, HWND hWnd);
+TqkLibrary_WindowCapture_Export BOOL BaseCapture_InitWindowCapture(BaseCapture* pBaseCapture, HWND hWnd);
+TqkLibrary_WindowCapture_Export BOOL BaseCapture_InitMonitorCapture(BaseCapture* pBaseCapture, HMONITOR HMONITOR);
 TqkLibrary_WindowCapture_Export BOOL BaseCapture_GetSize(BaseCapture* pBaseCapture, UINT32& width, UINT32& height);
 TqkLibrary_WindowCapture_Export BOOL BaseCapture_IsSupported(BaseCapture* pBaseCapture);
 

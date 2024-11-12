@@ -1,13 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace TqkLibrary.WindowCapture
+﻿namespace TqkLibrary.WindowCapture
 {
     public delegate void ReleaseNative(ref IntPtr pointer);
     public abstract class BaseNative
@@ -40,9 +31,9 @@ namespace TqkLibrary.WindowCapture
             ReleaseNative releaseNative
             )
         {
-            if (pointer == IntPtr.Zero) throw new ApplicationException($"{this.GetType().Name} alloc failed");
-            this._pointer = pointer;
-            this._releaseNative = releaseNative ?? throw new ArgumentNullException(nameof(releaseNative));
+            if (pointer == IntPtr.Zero) throw new ApplicationException($"{GetType().Name} alloc failed");
+            _pointer = pointer;
+            _releaseNative = releaseNative ?? throw new ArgumentNullException(nameof(releaseNative));
         }
         ~BaseNative()
         {

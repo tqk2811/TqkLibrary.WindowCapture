@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
+﻿using System.Drawing;
 using System.Drawing.Imaging;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TqkLibrary.WindowCapture.Captures
 {
@@ -156,10 +151,17 @@ https://jrsoftware.org/ishelp/index.php?topic=winvernotes
             }
         }
 
-        public override Task<bool> InitAsync(IntPtr hwnd)
+
+        public override Task<bool> InitWindowAsync(IntPtr hwnd)
         {
-            return Task.Factory.StartNew(() => BaseCapture_InitCapture(Pointer, hwnd), TaskCreationOptions.LongRunning);
+            return Task.Factory.StartNew(() => BaseCapture_InitWindowCapture(Pointer, hwnd), TaskCreationOptions.LongRunning);
         }
+        public override Task<bool> InitMonitorAsync(int HMONITOR)
+        {
+            return Task.Factory.StartNew(() => BaseCapture_InitMonitorCapture(Pointer, HMONITOR), TaskCreationOptions.LongRunning);
+        }
+
+
 
         public override Task<Bitmap?> CaptureImageAsync()
         {

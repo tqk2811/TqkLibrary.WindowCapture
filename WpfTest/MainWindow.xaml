@@ -34,10 +34,12 @@
                 
                 <GroupBox Header="WinrtGraphicCapture">
                     <st:StackPanel MarginBetweenChildren="5" Orientation="Vertical">
-                        <CheckBox IsChecked="{Binding IsShowCursor}" 
+                        <CheckBox IsChecked="{Binding WinrtGraphicCaptureVM.Cursor.IsShow}"
+                                  IsEnabled="{Binding WinrtGraphicCaptureVM.Cursor.IsSupported}"
                                   Content="IsShowCursor"
                                   />
-                        <CheckBox IsChecked="{Binding IsShowBorder}" 
+                        <CheckBox IsChecked="{Binding WinrtGraphicCaptureVM.Border.IsShow}" 
+                                  IsEnabled="{Binding WinrtGraphicCaptureVM.Border.IsSupported}"
                                   Content="IsShowBorder"
                                   />
                     </st:StackPanel>

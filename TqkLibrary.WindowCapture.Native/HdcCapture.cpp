@@ -38,7 +38,7 @@ VOID HdcCapture::SetMode(HdcCaptureMode mode)
 	_mode = mode;
 }
 
-BOOL HdcCapture::InitCapture(HWND hWnd)
+BOOL HdcCapture::InitWindowCapture(HWND hWnd)
 {
 	if (!this->_hdc)
 		return FALSE;

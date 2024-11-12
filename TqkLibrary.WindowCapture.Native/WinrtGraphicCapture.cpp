@@ -56,7 +56,7 @@ BOOL WinrtGraphicCapture::Init()
 	return result;
 }
 
-BOOL WinrtGraphicCapture::InitCapture(HWND hwnd)
+BOOL WinrtGraphicCapture::InitWindowCapture(HWND hwnd)
 {
 	BOOL result = Init();
 	if (!result)

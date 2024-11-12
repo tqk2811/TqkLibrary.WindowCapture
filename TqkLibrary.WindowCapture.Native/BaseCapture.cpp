@@ -13,10 +13,16 @@ VOID BaseCapture_Free(BaseCapture** ppBaseCapture)
 		}
 	}
 }
-BOOL BaseCapture_InitCapture(BaseCapture* pBaseCapture, HWND hwnd)
+BOOL BaseCapture_InitWindowCapture(BaseCapture* pBaseCapture, HWND hwnd)
 {
 	if (pBaseCapture)
-		return pBaseCapture->InitCapture(hwnd);
+		return pBaseCapture->InitWindowCapture(hwnd);
+	return FALSE;
+}
+BOOL BaseCapture_InitMonitorCapture(BaseCapture* pBaseCapture, HMONITOR HMONITOR)
+{
+	if (pBaseCapture)
+		return pBaseCapture->InitMonitorCapture(HMONITOR);
 	return FALSE;
 }
 BOOL BaseCapture_GetSize(BaseCapture* pBaseCapture, UINT32& width, UINT32& height)

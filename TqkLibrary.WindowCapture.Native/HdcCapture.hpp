@@ -25,7 +25,7 @@ public:
 	HdcCaptureMode GetMode();
 	VOID SetMode(HdcCaptureMode mode);
 
-	BOOL InitCapture(HWND hWnd);	
+	BOOL InitWindowCapture(HWND hWnd);	
 	BOOL Render(IDXGISurface* surface, bool isNewSurface, bool& isNewtargetView) ;
 	BOOL CaptureImage(void* data, UINT32 width, UINT32 height, UINT32 linesize);
 	BOOL GetSize(UINT32& width, UINT32& height);

@@ -19,6 +19,10 @@ namespace WpfTest
             RefreshWindowCommand = new(_RefreshWindowCommand);
             _RefreshWindowCommand();
         }
+        public WinrtGraphicCaptureVM WinrtGraphicCaptureVM { get; } = new();
+
+
+
 
         public IEnumerable<CaptureType> CaptureTypes { get; }
 
@@ -36,19 +40,7 @@ namespace WpfTest
             set { _CaptureImageSelected = value; NotifyPropertyChange(); }
         }
 
-        bool _IsShowCursor = false;
-        public bool IsShowCursor
-        {
-            get { return _IsShowCursor; }
-            set { _IsShowCursor = value; NotifyPropertyChange(); }
-        }
 
-        bool _IsShowBorder = false;
-        public bool IsShowBorder
-        {
-            get { return _IsShowBorder; }
-            set { _IsShowBorder = value; NotifyPropertyChange(); }
-        }
 
 
         ImageSource? _CapturedImage = null;
@@ -59,6 +51,8 @@ namespace WpfTest
         }
 
 
+
+
         public ObservableCollection<WindowHelper> Windows { get; } = new ObservableCollection<WindowHelper>();
         WindowHelper? _WindowHelperSelected = null;
         public WindowHelper? WindowHelperSelected
@@ -66,9 +60,6 @@ namespace WpfTest
             get { return _WindowHelperSelected; }
             set { _WindowHelperSelected = value; NotifyPropertyChange(); }
         }
-
-
-
         public BaseCommand RefreshWindowCommand { get; }
         void _RefreshWindowCommand()
         {

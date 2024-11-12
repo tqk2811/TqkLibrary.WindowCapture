@@ -12,7 +12,7 @@
 //	DesktopDuplicationCapture();
 //	~DesktopDuplicationCapture();
 //
-//	BOOL InitCapture(HWND hWnd);
+//	BOOL InitWindowCapture(HWND hWnd);
 //	BOOL Draw(ID3D11Device* device, ID3D11DeviceContext* deviceCtx, ComPtr<ID3D11Texture2D>& texture);
 //	HBITMAP Shoot();
 //	BOOL GetSize(UINT32& width, UINT32& height);

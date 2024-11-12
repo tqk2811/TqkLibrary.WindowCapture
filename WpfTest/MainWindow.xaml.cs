@@ -31,12 +31,16 @@ namespace WpfTest
         {
             InitializeComponent();
             this._mainWVM = this.DataContext as MainWVM ?? throw new InvalidOperationException();
-            this._mainWVM.PropertyChanged += _mainWVM_PropertyChanged;
+            this._mainWVM.WinrtGraphicCaptureVM.Cursor.PropertyChanged += _WinrtGraphicCaptureVM_PropertyChanged;
+            this._mainWVM.WinrtGraphicCaptureVM.Border.PropertyChanged += _WinrtGraphicCaptureVM_PropertyChanged;
         }
 
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            this._mainWVM.WinrtGraphicCaptureVM.Cursor.IsSupported = WinrtGraphicCapture.IsCaptureCursorToggleSupported;
+            this._mainWVM.WinrtGraphicCaptureVM.Border.IsSupported = WinrtGraphicCapture.IsBorderToggleSupported;
+
             InteropImage.WindowOwner = new WindowInteropHelper(this).Handle;
             InteropImage.OnRender = OnRender;
             InteropImage.RequestRender();
@@ -199,35 +203,42 @@ namespace WpfTest
             }
         }
 
-        private void _mainWVM_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private void _WinrtGraphicCaptureVM_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (nameof(MainWVM.IsShowCursor).Equals(e.PropertyName))
+            if (nameof(WinrtGraphicCaptureVM.ToggleVM.IsShow).Equals(e.PropertyName))
             {
-                ChangeIsShowCursor(_baseCapture_Render);
-                ChangeIsShowCursor(_baseCapture_Shoot);
+                PropChanged(_baseCapture_Render);
+                PropChanged(_baseCapture_Shoot);
             }
         }
 
-        void ChangeIsShowCursor(BaseCapture? baseCapture)
+        void PropChanged(BaseCapture? baseCapture)
         {
             if (baseCapture is WinrtGraphicCapture winrtGraphicCapture)
             {
-                if (winrtGraphicCapture.IsShowCursor != _mainWVM.IsShowCursor)
-                    winrtGraphicCapture.IsShowCursor = _mainWVM.IsShowCursor;
+                SetProp(winrtGraphicCapture);
             }
         }
         async Task InitAsync(BaseCapture? baseCapture, IntPtr hwnd)
         {
             if (baseCapture is not null)
             {
-                await baseCapture.InitAsync(hwnd);
+                await baseCapture.InitWindowAsync(hwnd);
                 if (baseCapture is WinrtGraphicCapture winrtGraphicCapture)
                 {
-                    if (winrtGraphicCapture.IsShowCursor != _mainWVM.IsShowCursor)
-                        winrtGraphicCapture.IsShowCursor = _mainWVM.IsShowCursor;
+                    SetProp(winrtGraphicCapture);
                 }
             }
         }
+
+        void SetProp(WinrtGraphicCapture winrtGraphicCapture)
+        {
+            if (WinrtGraphicCapture.IsCaptureCursorToggleSupported && winrtGraphicCapture.IsShowCursor != _mainWVM.WinrtGraphicCaptureVM.Cursor.IsShow)
+                winrtGraphicCapture.IsShowCursor = _mainWVM.WinrtGraphicCaptureVM.Cursor.IsShow;
+            if (WinrtGraphicCapture.IsBorderToggleSupported && winrtGraphicCapture.IsShowBorder != _mainWVM.WinrtGraphicCaptureVM.Border.IsShow)
+                winrtGraphicCapture.IsShowBorder = _mainWVM.WinrtGraphicCaptureVM.Border.IsShow;
+        }
+
 
         BaseCapture? CreateCapture(CaptureType? captureType)
         {
@@ -242,7 +253,9 @@ namespace WpfTest
                         return new HdcCapture() { Mode = HdcCapture.HdcCaptureMode.PrintWindow };
 
                     case CaptureType.WinrtGraphicCapture:
-                        return new WinrtGraphicCapture() { MaxFps = 0, IsShowCursor = _mainWVM.IsShowCursor, IsShowBorder = _mainWVM.IsShowBorder };
+                        WinrtGraphicCapture winrtGraphicCapture = new WinrtGraphicCapture() { MaxFps = 0 };
+                        SetProp(winrtGraphicCapture);
+                        return winrtGraphicCapture;
 
                     default: return null;
                 }

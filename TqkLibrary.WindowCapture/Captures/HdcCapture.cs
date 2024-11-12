@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
+﻿using System.Drawing;
 using System.Drawing.Imaging;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TqkLibrary.WindowCapture.Captures
 {
@@ -36,8 +30,8 @@ namespace TqkLibrary.WindowCapture.Captures
 
         public HdcCaptureMode Mode
         {
-            get { return HdcCapture_GetMode(this.Pointer); }
-            set { HdcCapture_SetMode(this.Pointer, value); }
+            get { return HdcCapture_GetMode(Pointer); }
+            set { HdcCapture_SetMode(Pointer, value); }
         }
 
         public override Task<Bitmap?> CaptureImageAsync()
