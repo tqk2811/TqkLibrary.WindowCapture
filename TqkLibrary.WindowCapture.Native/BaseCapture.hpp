@@ -24,6 +24,9 @@ public:
 	virtual BOOL Render(IDXGISurface* surface, bool isNewSurface, bool& isNewtargetView) = 0;
 	virtual BOOL CaptureImage(void* data, UINT32 width, UINT32 height, UINT32 linesize) = 0;
 	virtual BOOL IsSupported() = 0;
+
+	BOOL IsValidWindow(HWND hWnd);
+	BOOL IsValidMonitor(HMONITOR HMONITOR);
 protected:
 	HWND m_hWnd{ 0 };
 

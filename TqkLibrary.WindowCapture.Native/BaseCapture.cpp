@@ -39,6 +39,21 @@ BOOL BaseCapture_IsSupported(BaseCapture* pBaseCapture)
 	return FALSE;
 }
 
+BOOL BaseCapture_Render(BaseCapture* pBaseCapture, IDXGISurface* surface, bool isNewSurface, bool& isNewtargetView)
+{
+	if (!pBaseCapture)
+		return FALSE;
+	return pBaseCapture->Render(surface, isNewSurface, isNewtargetView);
+}
+BOOL BaseCapture_CaptureImage(BaseCapture* pBaseCapture, void* data, UINT32 width, UINT32 height, UINT32 lineSize)
+{
+	if (!pBaseCapture)
+		return FALSE;
+	return pBaseCapture->CaptureImage(data, width, height, lineSize);
+}
+
+
+
 BaseCapture::BaseCapture()
 {
 #ifdef HashHelper_Enable
@@ -56,15 +71,11 @@ BaseCapture::~BaseCapture()
 #endif // HashHelper_HashSize
 }
 
-BOOL BaseCapture_Render(BaseCapture* pBaseCapture, IDXGISurface* surface, bool isNewSurface, bool& isNewtargetView)
+BOOL BaseCapture::IsValidWindow(HWND hWnd)
 {
-	if (!pBaseCapture)
-		return FALSE;
-	return pBaseCapture->Render(surface, isNewSurface, isNewtargetView);
+	return TRUE;
 }
-BOOL BaseCapture_CaptureImage(BaseCapture* pBaseCapture, void* data, UINT32 width, UINT32 height, UINT32 lineSize)
+BOOL IsValidMonitor(HMONITOR HMONITOR)
 {
-	if (!pBaseCapture)
-		return FALSE;
-	return pBaseCapture->CaptureImage(data, width, height, lineSize);
+	return TRUE;
 }
