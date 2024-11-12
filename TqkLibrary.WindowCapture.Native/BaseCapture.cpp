@@ -1,5 +1,5 @@
 #include "BaseCapture.hpp"
-
+#include <dwmapi.h>
 
 VOID BaseCapture_Free(BaseCapture** ppBaseCapture)
 {
@@ -71,9 +71,45 @@ BaseCapture::~BaseCapture()
 #endif // HashHelper_HashSize
 }
 
-BOOL BaseCapture::IsValidWindow(HWND hWnd)
+//https://github.com/microsoft/Windows.UI.Composition-Win32-Samples/blob/a59e7586c0bd1a967e1e25f6ca0363e20151afe5/cpp/ScreenCaptureforHWND/ScreenCaptureforHWND/Win32WindowEnumeration.h#L45
 BOOL BaseCapture::IsValidWindow(HWND hwnd)
 {
+	if (hwnd == INVALID_HANDLE_VALUE || hwnd == 0)
+		return FALSE;
+
+	HWND shellWindow = GetShellWindow();
+	if (hwnd == shellWindow)
+		return FALSE;
+
+	if (!IsWindowVisible(hwnd))
+		return FALSE;
+
+	if (GetAncestor(hwnd, GA_ROOT) != hwnd)
+		return FALSE;
+
+	LONG style = GetWindowLong(hwnd, GWL_STYLE);
+	if (!((style & WS_DISABLED) != WS_DISABLED))
+		return FALSE;
+
+	DWORD cloaked = FALSE;
+	HRESULT hrTemp = DwmGetWindowAttribute(hwnd, DWMWA_CLOAKED, &cloaked, sizeof(cloaked));
+	if (SUCCEEDED(hrTemp) && cloaked == DWM_CLOAKED_SHELL)
+	{
+		return false;
+	}
+
+	auto len = GetWindowTextLength(hwnd);
+	if (len <= 0)
+		return FALSE;
+
+	WCHAR* text = new WCHAR[len + 1];
+	auto finalLength = GetWindowText(hwnd, text, len + 1);
+
+	delete[] text;
+
+	if (finalLength <= 0)
+		return FALSE;
+
 	return TRUE;
 }
 BOOL IsValidMonitor(HMONITOR HMONITOR)

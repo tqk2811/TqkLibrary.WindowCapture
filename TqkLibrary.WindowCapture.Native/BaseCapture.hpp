@@ -40,7 +40,7 @@ protected:
 
 TqkLibrary_WindowCapture_Export VOID BaseCapture_Free(BaseCapture** ppBaseCapture);
 
-TqkLibrary_WindowCapture_Export BOOL BaseCapture_InitWindowCapture(BaseCapture* pBaseCapture, HWND hWnd);
+TqkLibrary_WindowCapture_Export BOOL BaseCapture_InitWindowCapture(BaseCapture* pBaseCapture, HWND hwnd);
 TqkLibrary_WindowCapture_Export BOOL BaseCapture_InitMonitorCapture(BaseCapture* pBaseCapture, HMONITOR HMONITOR);
 TqkLibrary_WindowCapture_Export BOOL BaseCapture_GetSize(BaseCapture* pBaseCapture, UINT32& width, UINT32& height);
 TqkLibrary_WindowCapture_Export BOOL BaseCapture_IsSupported(BaseCapture* pBaseCapture);

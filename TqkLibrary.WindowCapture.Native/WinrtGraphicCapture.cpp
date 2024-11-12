@@ -65,7 +65,7 @@ BOOL WinrtGraphicCapture::InitWindowCapture(HWND hwnd)
 	//clean old
 	Close();
 
-	if (hwnd == INVALID_HANDLE_VALUE || hwnd == 0)
+	if (!IsValidWindow(hwnd))
 		return FALSE;
 
 	_mtx_lockInstance.lock();

@@ -46,8 +46,9 @@ BOOL HdcCapture::InitWindowCapture(HWND hwnd)
 	if (!_renderToSurface.Init())
 		return FALSE;
 
-	if (!hwnd || hwnd == INVALID_HANDLE_VALUE)
+	if (!IsValidWindow(hwnd))
 		return FALSE;
+
 	this->m_hwnd = hwnd;
 
 	return TRUE;
