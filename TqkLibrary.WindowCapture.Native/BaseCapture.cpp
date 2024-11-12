@@ -90,13 +90,15 @@ BOOL BaseCapture::IsValidWindow(HWND hwnd)
 	LONG style = GetWindowLong(hwnd, GWL_STYLE);
 	if (!((style & WS_DISABLED) != WS_DISABLED))
 		return FALSE;
+	if ((style & WS_EX_TOOLWINDOW) != 0)
+		return FALSE;
+	if ((style & WS_EX_APPWINDOW) != WS_EX_APPWINDOW)
+		return FALSE;
 
 	DWORD cloaked = FALSE;
 	HRESULT hrTemp = DwmGetWindowAttribute(hwnd, DWMWA_CLOAKED, &cloaked, sizeof(cloaked));
 	if (SUCCEEDED(hrTemp) && cloaked == DWM_CLOAKED_SHELL)
-	{
-		return false;
-	}
+		return FALSE;
 
 	auto len = GetWindowTextLength(hwnd);
 	if (len <= 0)
@@ -104,7 +106,6 @@ BOOL BaseCapture::IsValidWindow(HWND hwnd)
 
 	WCHAR* text = new WCHAR[len + 1];
 	auto finalLength = GetWindowText(hwnd, text, len + 1);
-
 	delete[] text;
 
 	if (finalLength <= 0)
