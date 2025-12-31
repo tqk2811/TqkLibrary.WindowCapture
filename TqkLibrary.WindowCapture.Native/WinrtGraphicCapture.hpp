@@ -34,6 +34,7 @@ public:
 
 	// BaseCapture
 	BOOL InitWindowCapture(HWND hwnd);
+	BOOL InitMonitorCapture(HMONITOR HMONITOR);
 	BOOL GetSize(UINT32& width, UINT32& height);
 	BOOL CaptureImage(void* data, UINT32 width, UINT32 height, UINT32 linesize);
 	BOOL Render(IDXGISurface* surface, bool isNewSurface, bool& isNewtargetView);

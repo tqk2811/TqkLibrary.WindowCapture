@@ -113,7 +113,7 @@ BOOL BaseCapture::IsValidWindow(HWND hwnd)
 
 	return TRUE;
 }
-BOOL IsValidMonitor(HMONITOR HMONITOR)
+BOOL BaseCapture::IsValidMonitor(HMONITOR HMONITOR)
 {
-	return TRUE;
+	return FALSE;
 }

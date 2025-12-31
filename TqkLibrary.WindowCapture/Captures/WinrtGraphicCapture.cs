@@ -156,10 +156,12 @@ https://jrsoftware.org/ishelp/index.php?topic=winvernotes
         {
             return Task.Factory.StartNew(() => BaseCapture_InitWindowCapture(Pointer, hwnd), TaskCreationOptions.LongRunning);
         }
+#if DEBUG
         public override Task<bool> InitMonitorAsync(int HMONITOR)
         {
             return Task.Factory.StartNew(() => BaseCapture_InitMonitorCapture(Pointer, HMONITOR), TaskCreationOptions.LongRunning);
         }
+#endif
 
 
 

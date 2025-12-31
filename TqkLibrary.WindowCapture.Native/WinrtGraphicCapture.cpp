@@ -102,6 +102,25 @@ BOOL WinrtGraphicCapture::InitWindowCapture(HWND hwnd)
 
 	return TRUE;
 }
+BOOL WinrtGraphicCapture::InitMonitorCapture(HMONITOR HMONITOR)
+{
+	BOOL result = Init();
+	if (!result)
+		return result;
+
+	//clean old
+	Close();
+
+	if (!IsValidMonitor(HMONITOR))
+		return FALSE;
+
+
+
+
+
+
+	return TRUE;
+}
 BOOL WinrtGraphicCapture::IsSupported()
 {
 	return winrt::Windows::Foundation::Metadata::ApiInformation::IsApiContractPresent(
