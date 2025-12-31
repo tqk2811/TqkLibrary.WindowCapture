@@ -1,11 +1,11 @@
 #ifndef _WindowCapture_H_BaseCapture_H_
 #define _WindowCapture_H_BaseCapture_H_
 
+#define _DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR
 #include "Directx.hpp"
 #include "D3DClass.hpp"
 #include "Exports.hpp"
 #include "HashHelper.hpp"
-
 
 class BaseCapture
 {
