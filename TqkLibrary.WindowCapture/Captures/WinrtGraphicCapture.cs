@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 
 namespace TqkLibrary.WindowCapture.Captures
 {
-    public class WinrtGraphicCapture : BaseCapture
+    public sealed class WinrtGraphicCapture : BaseCapture
     {
         [DllImport(_dllName, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
         static extern IntPtr WinrtGraphicCapture_Alloc();
@@ -156,12 +156,10 @@ https://jrsoftware.org/ishelp/index.php?topic=winvernotes
         {
             return Task.Factory.StartNew(() => BaseCapture_InitWindowCapture(Pointer, hwnd), TaskCreationOptions.LongRunning);
         }
-#if DEBUG
-        public override Task<bool> InitMonitorAsync(int HMONITOR)
+        public Task<bool> InitMonitorAsync(IntPtr HMONITOR)
         {
             return Task.Factory.StartNew(() => BaseCapture_InitMonitorCapture(Pointer, HMONITOR), TaskCreationOptions.LongRunning);
         }
-#endif
 
 
 

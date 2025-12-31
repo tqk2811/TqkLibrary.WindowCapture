@@ -74,30 +74,36 @@ BOOL WinrtGraphicCapture::InitWindowCapture(HWND hwnd)
 	auto activation_factory = winrt::get_activation_factory<winrt::Windows::Graphics::Capture::GraphicsCaptureItem>();
 	auto interop_factory = activation_factory.as<IGraphicsCaptureItemInterop>();
 
-	interop_factory->CreateForWindow(
+	HRESULT hresult = interop_factory->CreateForWindow(
 		hwnd,
 		winrt::guid_of<ABI::Windows::Graphics::Capture::IGraphicsCaptureItem>(),
 		reinterpret_cast<void**>(winrt::put_abi(m_item))
 	);
 
-	m_lastSize = m_item.Size();
+	if (SUCCEEDED(hresult))
+	{
+		m_closedToken = m_item.Closed({ this, &WinrtGraphicCapture::OnCaptureItemClosed });
 
-	m_framePool = winrt::Windows::Graphics::Capture::Direct3D11CaptureFramePool::CreateFreeThreaded(
-		m_direct3d_device,
-		winrt::Windows::Graphics::DirectX::DirectXPixelFormat::B8G8R8A8UIntNormalized,
-		FramePool_NUMBER_BUFFER,
-		m_lastSize);//not work with D3D11_CREATE_DEVICE_SINGLETHREADED
-	m_session = m_framePool.CreateCaptureSession(m_item);
-	m_frameArrived = m_framePool.FrameArrived(winrt::auto_revoke, { this, &WinrtGraphicCapture::OnFrameArrived });
+		m_lastSize = m_item.Size();
 
-	if (WinrtGraphicCapture_IsCaptureCursorToggleSupported() && m_isSetCursorState != TRUE)
-		m_session.IsCursorCaptureEnabled(m_isSetCursorState);
-	if (WinrtGraphicCapture_IsBorderToggleSupported() && m_isSetBorderState != TRUE)
-		m_session.IsBorderRequired(m_isSetBorderState);
+		m_framePool = winrt::Windows::Graphics::Capture::Direct3D11CaptureFramePool::CreateFreeThreaded(
+			m_direct3d_device,
+			winrt::Windows::Graphics::DirectX::DirectXPixelFormat::B8G8R8A8UIntNormalized,
+			FramePool_NUMBER_BUFFER,
+			m_lastSize);//not work with D3D11_CREATE_DEVICE_SINGLETHREADED
+		m_session = m_framePool.CreateCaptureSession(m_item);
+		m_frameArrived = m_framePool.FrameArrived(winrt::auto_revoke, { this, &WinrtGraphicCapture::OnFrameArrived });
 
-	m_session.StartCapture();
+		if (WinrtGraphicCapture_IsCaptureCursorToggleSupported() && m_isSetCursorState != TRUE)
+			m_session.IsCursorCaptureEnabled(m_isSetCursorState);
+		if (WinrtGraphicCapture_IsBorderToggleSupported() && m_isSetBorderState != TRUE)
+			m_session.IsBorderRequired(m_isSetBorderState);
 
-	_isCapturing = TRUE;
+		m_session.StartCapture();
+
+		_isCapturing = TRUE;
+	}
+
 	_mtx_lockInstance.unlock();
 
 	return TRUE;
@@ -114,10 +120,41 @@ BOOL WinrtGraphicCapture::InitMonitorCapture(HMONITOR HMONITOR)
 	if (!IsValidMonitor(HMONITOR))
 		return FALSE;
 
+	_mtx_lockInstance.lock();
 
+	auto activation_factory = winrt::get_activation_factory<winrt::Windows::Graphics::Capture::GraphicsCaptureItem>();
+	auto interop_factory = activation_factory.as<IGraphicsCaptureItemInterop>();
 
+	HRESULT hresult = interop_factory->CreateForMonitor(
+		HMONITOR,
+		winrt::guid_of<ABI::Windows::Graphics::Capture::IGraphicsCaptureItem>(),
+		reinterpret_cast<void**>(winrt::put_abi(m_item))
+	);
 
+	if (SUCCEEDED(hresult))
+	{
+		m_closedToken = m_item.Closed({ this, &WinrtGraphicCapture::OnCaptureItemClosed });
+		m_lastSize = m_item.Size();
 
+		m_framePool = winrt::Windows::Graphics::Capture::Direct3D11CaptureFramePool::CreateFreeThreaded(
+			m_direct3d_device,
+			winrt::Windows::Graphics::DirectX::DirectXPixelFormat::B8G8R8A8UIntNormalized,
+			FramePool_NUMBER_BUFFER,
+			m_lastSize);//not work with D3D11_CREATE_DEVICE_SINGLETHREADED
+		m_session = m_framePool.CreateCaptureSession(m_item);
+		m_frameArrived = m_framePool.FrameArrived(winrt::auto_revoke, { this, &WinrtGraphicCapture::OnFrameArrived });
+
+		if (WinrtGraphicCapture_IsCaptureCursorToggleSupported() && m_isSetCursorState != TRUE)
+			m_session.IsCursorCaptureEnabled(m_isSetCursorState);
+		if (WinrtGraphicCapture_IsBorderToggleSupported() && m_isSetBorderState != TRUE)
+			m_session.IsBorderRequired(m_isSetBorderState);
+
+		m_session.StartCapture();
+
+		_isCapturing = TRUE;
+	}
+
+	_mtx_lockInstance.unlock();
 
 	return TRUE;
 }
@@ -293,13 +330,17 @@ BOOL WinrtGraphicCapture::CaptureImage(void* data, UINT32 width, UINT32 height, 
 	}
 	return result;
 }
-
+VOID WinrtGraphicCapture::OnCaptureItemClosed(winrt::Windows::Graphics::Capture::GraphicsCaptureItem const& sender, winrt::Windows::Foundation::IInspectable const& args)
+{
+	this->Close();
+}
 VOID WinrtGraphicCapture::Close()
 {
 	_mtx_lockInstance.lock();
 
 	if (_isCapturing)
 	{
+		m_item.Closed(m_closedToken);
 		m_frameArrived.revoke();
 		if (m_session)
 			m_session.Close();

@@ -15,7 +15,7 @@ namespace TqkLibrary.WindowCapture
 
 
         [DllImport(_dllName, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
-        protected static extern bool BaseCapture_InitMonitorCapture(IntPtr pointer, int HMONITOR);
+        protected static extern bool BaseCapture_InitMonitorCapture(IntPtr pointer, IntPtr HMONITOR);
 
 
         [DllImport(_dllName, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]

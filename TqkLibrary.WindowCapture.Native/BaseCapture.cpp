@@ -115,5 +115,10 @@ BOOL BaseCapture::IsValidWindow(HWND hwnd)
 }
 BOOL BaseCapture::IsValidMonitor(HMONITOR HMONITOR)
 {
-	return FALSE;
+	if (HMONITOR == NULL) {
+		return FALSE;
+	}
+	MONITORINFO mi;
+	mi.cbSize = sizeof(MONITORINFO);
+	return GetMonitorInfo(HMONITOR, &mi);
 }

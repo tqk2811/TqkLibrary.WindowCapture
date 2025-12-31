@@ -58,11 +58,12 @@ private:
 		winrt::Windows::Foundation::IInspectable const&);
 	BOOL Init();
 	VOID Close();
+	VOID OnCaptureItemClosed(winrt::Windows::Graphics::Capture::GraphicsCaptureItem const& sender, winrt::Windows::Foundation::IInspectable const& args);
 
 	RenderToSurface _renderToSurface;
 	winrt::Windows::Graphics::DirectX::Direct3D11::IDirect3DDevice m_direct3d_device{ nullptr };
 
-	
+	winrt::event_token m_closedToken{ NULL };
 	winrt::Windows::Graphics::SizeInt32 m_lastSize{ NULL };
 	winrt::Windows::Foundation::TimeSpan m_lastTime{ NULL };
 	winrt::Windows::Foundation::TimeSpan m_RenderedTime{ NULL };

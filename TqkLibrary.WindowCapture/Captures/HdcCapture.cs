@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 
 namespace TqkLibrary.WindowCapture.Captures
 {
-    public class HdcCapture : BaseCapture
+    public sealed class HdcCapture : BaseCapture
     {
         public enum HdcCaptureMode : byte
         {
