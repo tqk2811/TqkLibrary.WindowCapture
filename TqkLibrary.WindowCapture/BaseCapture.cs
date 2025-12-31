@@ -63,7 +63,7 @@ namespace TqkLibrary.WindowCapture
         {
             return Task.FromResult(BaseCapture_InitWindowCapture(Pointer, hwnd));
         }
-        public virtual Task<bool> InitMonitorAsync(int HMONITOR)
+        public virtual Task<bool> InitMonitorAsync(IntPtr HMONITOR)
         {
             return Task.FromResult(BaseCapture_InitMonitorCapture(Pointer, HMONITOR));
         }
