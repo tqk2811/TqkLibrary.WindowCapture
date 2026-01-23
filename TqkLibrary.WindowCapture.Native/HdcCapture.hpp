@@ -7,7 +7,6 @@
 #include "WinApi.hpp"
 #include "Directx.hpp"
 #include "Gdi.hpp"
-#include "HashHelper.hpp"
 #include "RenderToSurface.hpp"
 
 enum HdcCaptureMode: BYTE
@@ -45,10 +44,6 @@ private:
 		ID3D11Device* device,
 		ID3D11DeviceContext* deviceCtx,
 		ComPtr<ID3D11Texture2D>& texture
-#ifdef HashHelper_Enable
-		, HashHelper* pHashHelper,
-		BYTE* oldHash
-#endif
 	);
 };
 

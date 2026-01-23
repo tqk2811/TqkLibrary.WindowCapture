@@ -56,19 +56,10 @@ BOOL BaseCapture_CaptureImage(BaseCapture* pBaseCapture, void* data, UINT32 widt
 
 BaseCapture::BaseCapture()
 {
-#ifdef HashHelper_Enable
-	ZeroMemory(this->m_hash, HashHelper_HashSize);
-	this->m_HashHelper = new HashHelper();
-#endif // HashHelper_HashSize
 }
 
 BaseCapture::~BaseCapture()
 {
-#ifdef HashHelper_Enable
-	if (this->m_HashHelper)
-		delete this->m_HashHelper;
-	this->m_HashHelper = nullptr;
-#endif // HashHelper_HashSize
 }
 
 //https://github.com/microsoft/Windows.UI.Composition-Win32-Samples/blob/a59e7586c0bd1a967e1e25f6ca0363e20151afe5/cpp/ScreenCaptureforHWND/ScreenCaptureforHWND/Win32WindowEnumeration.h#L45

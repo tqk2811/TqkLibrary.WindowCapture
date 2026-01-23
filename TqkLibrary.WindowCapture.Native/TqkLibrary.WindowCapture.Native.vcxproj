@@ -98,7 +98,7 @@
       </PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile />
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\xxHash;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -120,7 +120,7 @@
       </PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile />
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\xxHash;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -142,7 +142,7 @@
       </PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile />
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\xxHash;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -164,7 +164,7 @@
       </PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile />
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\xxHash;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -185,7 +185,6 @@
     <ClInclude Include="Gdi.hpp" />
     <ClInclude Include="HdcCapture.hpp" />
     <ClInclude Include="InputTextureClass.hpp" />
-    <ClInclude Include="HashHelper.hpp" />
     <ClInclude Include="PixelShaderClass.hpp" />
     <ClInclude Include="RenderTextureSurfaceClass.hpp" />
     <ClInclude Include="RenderToSurface.hpp" />
@@ -202,7 +201,6 @@
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="HdcCapture.cpp" />
     <ClCompile Include="InputTextureClass.cpp" />
-    <ClCompile Include="HashHelper.cpp" />
     <ClCompile Include="PixelShaderClass.cpp" />
     <ClCompile Include="RenderTextureSurfaceClass.cpp" />
     <ClCompile Include="RenderToSurface.cpp" />

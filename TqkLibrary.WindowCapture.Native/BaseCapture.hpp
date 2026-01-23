@@ -5,7 +5,6 @@
 #include "Directx.hpp"
 #include "D3DClass.hpp"
 #include "Exports.hpp"
-#include "HashHelper.hpp"
 
 class BaseCapture
 {
@@ -29,12 +28,6 @@ public:
 	BOOL IsValidMonitor(HMONITOR HMONITOR);
 protected:
 	HWND m_hwnd{ 0 };
-
-#ifdef HashHelper_Enable
-	HashHelper* m_HashHelper;
-	BYTE m_hash[HashHelper_HashSize];
-#endif
-
 };
 
 

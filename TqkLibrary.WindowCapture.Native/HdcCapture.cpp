@@ -70,11 +70,7 @@ BOOL HdcCapture::Render(IDXGISurface* surface, bool isNewSurface, bool& isNewtar
 		ComPtr<ID3D11Device> device = _renderToSurface.GetDevive();
 		ComPtr<ID3D11DeviceContext> deviceCtx = _renderToSurface.GetDeviceContext();
 
-		result = CopyBitmapToTexture(hBitmap, this->_hdc, device.Get(), deviceCtx.Get(), _renderTexture
-#ifdef HashHelper_Enable
-			, m_HashHelper, this->m_hash
-#endif
-		);
+		result = CopyBitmapToTexture(hBitmap, this->_hdc, device.Get(), deviceCtx.Get(), _renderTexture);
 
 		if (result)
 			result = _renderToSurface.SendTexture(_renderTexture.Get());
@@ -272,10 +268,6 @@ BOOL HdcCapture::CopyBitmapToTexture(
 	ID3D11Device* device,
 	ID3D11DeviceContext* deviceCtx,
 	ComPtr<ID3D11Texture2D>& texture
-#ifdef HashHelper_Enable
-	, HashHelper* pHashHelper,
-	BYTE* oldHash
-#endif
 )
 {
 	if (!hBitmap || hBitmap == INVALID_HANDLE_VALUE ||
@@ -329,26 +321,6 @@ BOOL HdcCapture::CopyBitmapToTexture(
 		DIB_RGB_COLORS) == bitmap.bmHeight;
 	if (!result)
 		goto end;
-
-#ifdef HashHelper_Enable
-	if (pHashHelper && oldHash)
-	{
-		BYTE currentHash[HashHelper_HashSize];
-		result = pHashHelper->CalcHash((const BYTE const*)pData, dwBmpSize, currentHash, HashHelper_HashSize) == HashHelper_HashSize;
-		if (!result)
-			goto end;
-
-		result = memcmp(currentHash, oldHash, HashHelper_HashSize) != 0;//same hash => no new image
-		if (result)
-		{
-			memcpy(oldHash, currentHash, HashHelper_HashSize);
-		}
-		else
-		{
-			goto end;
-		}
-	}
-#endif // #ifdef HashHelper_HashSize
 
 	{
 		D3D11_TEXTURE2D_DESC texDesc;
