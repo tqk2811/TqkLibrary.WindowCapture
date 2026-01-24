@@ -27,7 +27,6 @@ public:
 	BOOL IsValidWindow(HWND hwnd);
 	BOOL IsValidMonitor(HMONITOR HMONITOR);
 protected:
-	HWND m_hwnd{ 0 };
 };
 
 

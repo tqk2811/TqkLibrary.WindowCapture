@@ -1,10 +1,11 @@
 ﻿using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
+using TqkLibrary.WindowCapture.Interfaces;
 
 namespace TqkLibrary.WindowCapture.Captures
 {
-    public sealed class HdcCapture : BaseCapture
+    public sealed class HdcCapture : BaseCapture, IMonitorCapture, IWindowCapture
     {
         public enum HdcCaptureMode : byte
         {
@@ -33,34 +34,8 @@ namespace TqkLibrary.WindowCapture.Captures
             get { return HdcCapture_GetMode(Pointer); }
             set { HdcCapture_SetMode(Pointer, value); }
         }
+        public bool InitWindow(IntPtr hwnd) => BaseCapture_InitWindowCapture(Pointer, hwnd);
+        public bool InitMonitor(IntPtr HMONITOR) => BaseCapture_InitMonitorCapture(Pointer, HMONITOR);
 
-        public override Task<Bitmap?> CaptureImageAsync()
-        {
-            Size size = Size;
-            if (size.Width <= 0 || size.Height <= 0) return Task.FromResult<Bitmap?>(null);
-
-            Bitmap bitmap = new Bitmap(size.Width, size.Height);
-            BitmapData bitmapData = bitmap.LockBits(new Rectangle(0, 0, size.Width, size.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppRgb);
-
-            //ARGB only
-            bool result = BaseCapture_CaptureImage(
-                base.Pointer,
-                bitmapData.Scan0,
-                (UInt32)bitmapData.Width,
-                (UInt32)bitmapData.Height,
-                (UInt32)bitmapData.Stride
-                );
-            bitmap.UnlockBits(bitmapData);
-
-            if (result)
-            {
-                return Task.FromResult<Bitmap?>(bitmap);
-            }
-            else
-            {
-                bitmap.Dispose();
-                return Task.FromResult<Bitmap?>(null);
-            }
-        }
     }
 }

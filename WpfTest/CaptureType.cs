@@ -5,5 +5,6 @@
         HdcCapture_BitBlt,
         HdcCapture_PrintWindow,
         WinrtGraphicCapture,
+        DesktopDuplicationCapture,
     }
 }

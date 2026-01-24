@@ -23,7 +23,7 @@
         internal static extern bool SetDllDirectory(string PathName);
 #endif
 
-        public IntPtr Pointer { get { return _pointer; } }
+        protected IntPtr Pointer { get { return _pointer; } }
         private IntPtr _pointer;
         readonly ReleaseNative _releaseNative;
         protected BaseNative(

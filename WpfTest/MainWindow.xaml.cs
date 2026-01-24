@@ -15,6 +15,7 @@ using TqkLibrary.WinApi;
 using TqkLibrary.WinApi.FindWindowHelper;
 using TqkLibrary.WindowCapture;
 using TqkLibrary.WindowCapture.Captures;
+using TqkLibrary.WindowCapture.Interfaces;
 using TqkLibrary.Wpf.Interop.DirectX;
 using TqkLibrary.WpfUi;
 
@@ -154,7 +155,7 @@ namespace WpfTest
                 this.Cursor = null;
             }
         }
-        BaseCapture? _baseCapture_Render;
+        ICapture? _baseCapture_Render;
         private async void cbb_renderMode_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             _baseCapture_Render?.Dispose();
@@ -172,7 +173,7 @@ namespace WpfTest
             }
         }
 
-        BaseCapture? _baseCapture_Shoot;
+        ICapture? _baseCapture_Shoot;
         private async void cbb_captureMode_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             _baseCapture_Shoot?.Dispose();
@@ -192,7 +193,7 @@ namespace WpfTest
 
         private async void btn_sceenshoot_Click(object sender, RoutedEventArgs e)
         {
-            using Bitmap? bitmap = _baseCapture_Shoot is not null ? await _baseCapture_Shoot.CaptureImageAsync() : null;
+            using Bitmap? bitmap = _baseCapture_Shoot?.Capture();
             if (bitmap is not null)
             {
                 _mainWVM.CapturedImage = bitmap.ToBitmapImage();
@@ -212,19 +213,19 @@ namespace WpfTest
             }
         }
 
-        void PropChanged(BaseCapture? baseCapture)
+        void PropChanged(ICapture? capture)
         {
-            if (baseCapture is WinrtGraphicCapture winrtGraphicCapture)
+            if (capture is WinrtGraphicCapture winrtGraphicCapture)
             {
                 SetProp(winrtGraphicCapture);
             }
         }
-        async Task InitAsync(BaseCapture? baseCapture, IntPtr hwnd)
+        async Task InitAsync(ICapture? capture, IntPtr hwnd)
         {
-            if (baseCapture is not null)
+            if (capture is IWindowCapture windowCapture)
             {
-                await baseCapture.InitWindowAsync(hwnd);
-                if (baseCapture is WinrtGraphicCapture winrtGraphicCapture)
+                windowCapture.InitWindow(hwnd);
+                if (windowCapture is WinrtGraphicCapture winrtGraphicCapture)
                 {
                     SetProp(winrtGraphicCapture);
                 }
@@ -240,7 +241,7 @@ namespace WpfTest
         }
 
 
-        BaseCapture? CreateCapture(CaptureType? captureType)
+        ICapture? CreateCapture(CaptureType? captureType)
         {
             try
             {
@@ -256,6 +257,10 @@ namespace WpfTest
                         WinrtGraphicCapture winrtGraphicCapture = new WinrtGraphicCapture() { MaxFps = 0 };
                         SetProp(winrtGraphicCapture);
                         return winrtGraphicCapture;
+
+                    case CaptureType.DesktopDuplicationCapture:
+                        DesktopDuplicationCapture desktopDuplicationCapture = new();
+                        return desktopDuplicationCapture;
 
                     default: return null;
                 }

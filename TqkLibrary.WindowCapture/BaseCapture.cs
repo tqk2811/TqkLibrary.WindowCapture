@@ -1,9 +1,12 @@
 ﻿using System.Drawing;
+using System.Drawing.Imaging;
+using System.Reflection;
 using System.Runtime.InteropServices;
+using TqkLibrary.WindowCapture.Interfaces;
 
 namespace TqkLibrary.WindowCapture
 {
-    public abstract class BaseCapture : BaseNative
+    public abstract class BaseCapture : BaseNative, ICapture
     {
 
         [DllImport(_dllName, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
@@ -59,18 +62,37 @@ namespace TqkLibrary.WindowCapture
             }
         }
 
-        public virtual Task<bool> InitWindowAsync(IntPtr hwnd)
+        public virtual Bitmap? Capture()
         {
-            return Task.FromResult(BaseCapture_InitWindowCapture(Pointer, hwnd));
-        }
-        public virtual Task<bool> InitMonitorAsync(IntPtr HMONITOR)
-        {
-            return Task.FromResult(BaseCapture_InitMonitorCapture(Pointer, HMONITOR));
-        }
+            Size size = Size;
+            if (size.Width <= 0 || size.Height <= 0) return null;
 
-        public abstract Task<Bitmap?> CaptureImageAsync();
+            Bitmap bitmap = new Bitmap(size.Width, size.Height);
+            BitmapData bitmapData = bitmap.LockBits(new Rectangle(0, 0, size.Width, size.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppRgb);
 
+            //ARGB only
+            bool result = BaseCapture_CaptureImage(
+                base.Pointer,
+                bitmapData.Scan0,
+                (UInt32)bitmapData.Width,
+                (UInt32)bitmapData.Height,
+                (UInt32)bitmapData.Stride
+                );
+            bitmap.UnlockBits(bitmapData);
+
+            if (result)
+            {
+                return bitmap;
+            }
+            else
+            {
+                bitmap.Dispose();
+                return null;
+            }
+        }
         public virtual bool Render(IntPtr surface, bool isNewSurface, ref bool isNewtargetView)
             => BaseCapture_Render(Pointer, surface, isNewSurface, ref isNewtargetView);
+
+
     }
 }

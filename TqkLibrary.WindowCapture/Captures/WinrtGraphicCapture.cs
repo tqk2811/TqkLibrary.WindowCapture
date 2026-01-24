@@ -1,10 +1,11 @@
 ﻿using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
+using TqkLibrary.WindowCapture.Interfaces;
 
 namespace TqkLibrary.WindowCapture.Captures
 {
-    public sealed class WinrtGraphicCapture : BaseCapture
+    public sealed class WinrtGraphicCapture : BaseCapture, IMonitorCapture, IWindowCapture
     {
         [DllImport(_dllName, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
         static extern IntPtr WinrtGraphicCapture_Alloc();
@@ -151,45 +152,7 @@ https://jrsoftware.org/ishelp/index.php?topic=winvernotes
             }
         }
 
-
-        public override Task<bool> InitWindowAsync(IntPtr hwnd)
-        {
-            return Task.Factory.StartNew(() => BaseCapture_InitWindowCapture(Pointer, hwnd), TaskCreationOptions.LongRunning);
-        }
-        public override Task<bool> InitMonitorAsync(IntPtr HMONITOR)
-        {
-            return Task.Factory.StartNew(() => BaseCapture_InitMonitorCapture(Pointer, HMONITOR), TaskCreationOptions.LongRunning);
-        }
-
-
-
-        public override Task<Bitmap?> CaptureImageAsync()
-        {
-            Size size = Size;
-            if (size.Width <= 0 || size.Height <= 0) return Task.FromResult<Bitmap?>(null);
-
-            Bitmap bitmap = new Bitmap(size.Width, size.Height);
-            BitmapData bitmapData = bitmap.LockBits(new Rectangle(0, 0, size.Width, size.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppRgb);
-
-            //ARGB only
-            bool result = BaseCapture_CaptureImage(
-                base.Pointer,
-                bitmapData.Scan0,
-                (UInt32)bitmapData.Width,
-                (UInt32)bitmapData.Height,
-                (UInt32)bitmapData.Stride
-                );
-            bitmap.UnlockBits(bitmapData);
-
-            if (result)
-            {
-                return Task.FromResult<Bitmap?>(bitmap);
-            }
-            else
-            {
-                bitmap.Dispose();
-                return Task.FromResult<Bitmap?>(null);
-            }
-        }
+        public bool InitWindow(IntPtr hwnd) => BaseCapture_InitWindowCapture(Pointer, hwnd);
+        public bool InitMonitor(IntPtr HMONITOR) => BaseCapture_InitMonitorCapture(Pointer, HMONITOR);
     }
 }

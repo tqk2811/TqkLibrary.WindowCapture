@@ -31,6 +31,9 @@ public:
 	BOOL IsSupported() { return TRUE; }
 
 private:
+	HWND m_hwnd{ 0 };
+	HMONITOR m_hmonitor{ 0 };
+
 	HDC _hdc{ 0 };
 	HdcCaptureMode _mode{ HdcCaptureMode_BitBlt };
 	RenderToSurface _renderToSurface;

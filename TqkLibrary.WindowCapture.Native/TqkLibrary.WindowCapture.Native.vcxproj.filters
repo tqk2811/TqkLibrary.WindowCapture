@@ -31,12 +31,6 @@
     <Filter Include="Captures\Win10_1903">
       <UniqueIdentifier>{8dba567a-5be2-405f-9804-2f1f3a00f3c4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Captures\Win10_1903\Header Files">
-      <UniqueIdentifier>{26f0c4ce-617d-4529-97c2-46810609ccf3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Captures\Win10_1903\Source Files">
-      <UniqueIdentifier>{37295491-60ea-4ac7-8326-5b7dc9f48de3}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Captures\DesktopDuplication">
       <UniqueIdentifier>{7bd1da31-10d6-4b9e-85e4-9ac3c092f202}</UniqueIdentifier>
     </Filter>
