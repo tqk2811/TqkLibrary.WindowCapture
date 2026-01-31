@@ -12,7 +12,6 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using TqkLibrary.WinApi;
-using TqkLibrary.WinApi.FindWindowHelper;
 using TqkLibrary.WindowCapture;
 using TqkLibrary.WindowCapture.Captures;
 using TqkLibrary.WindowCapture.Interfaces;
@@ -225,10 +224,10 @@ namespace WpfTest
             if (capture is IWindowCapture windowCapture)
             {
                 windowCapture.InitWindow(hwnd);
-                if (windowCapture is WinrtGraphicCapture winrtGraphicCapture)
-                {
-                    SetProp(winrtGraphicCapture);
-                }
+            }
+            if (capture is WinrtGraphicCapture winrtGraphicCapture)
+            {
+                SetProp(winrtGraphicCapture);
             }
         }
 

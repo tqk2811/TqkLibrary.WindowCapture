@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Media;
-using TqkLibrary.WinApi.FindWindowHelper;
+using TqkLibrary.WinApi.Helpers;
 using TqkLibrary.WpfUi;
 
 namespace WpfTest
