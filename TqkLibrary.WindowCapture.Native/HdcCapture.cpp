@@ -59,10 +59,10 @@ BOOL HdcCapture::InitMonitorCapture(HMONITOR hmonitor)
 	if (!this->_hdc)
 		return FALSE;
 
-	if (!this->_renderToSurface.Init())
+	if (!this->IsValidMonitor(hmonitor))
 		return FALSE;
 
-	if (!this->IsValidMonitor(hmonitor))
+	if (!this->_renderToSurface.Init())
 		return FALSE;
 
 	this->m_hmonitor = hmonitor;
