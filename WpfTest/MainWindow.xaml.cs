@@ -221,11 +221,25 @@ namespace WpfTest
         {
             if (capture is IWindowCapture windowCapture && item.WindowHelper is not null)
             {
-                windowCapture.InitWindow(item.WindowHelper.WindowHandle);
+                try
+                {
+                    windowCapture.InitWindow(item.WindowHelper.WindowHandle);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, ex.GetType().FullName);
+                }
             }
             if (capture is IMonitorCapture monitorCapture && item.HMonitor is not null)
             {
-                monitorCapture.InitMonitor(item.HMonitor.Value);
+                try
+                {
+                    monitorCapture.InitMonitor(item.HMonitor.Value);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, ex.GetType().FullName);
+                }
             }
             if (capture is WinrtGraphicCapture winrtGraphicCapture)
             {
