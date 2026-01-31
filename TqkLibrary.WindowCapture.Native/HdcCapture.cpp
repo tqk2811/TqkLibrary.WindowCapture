@@ -267,8 +267,9 @@ HBITMAP HdcCapture::CaptureToHBitmap(HdcCaptureMode mode)
 	case HdcCaptureMode::HdcCaptureMode_PrintWindow://PrintWindow only work with HWND
 		if (this->m_hwnd)
 		{
-			if (!PrintWindow(this->m_hwnd, hdcDest, 0))
-				goto end;
+			if (!PrintWindow(this->m_hwnd, hdcDest, PW_RENDERFULLCONTENT))
+				if (!PrintWindow(this->m_hwnd, hdcDest, 0))
+					goto end;
 			isSuccess = TRUE;
 		}
 		break;
