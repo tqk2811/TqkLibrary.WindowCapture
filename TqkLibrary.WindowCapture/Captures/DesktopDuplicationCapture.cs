@@ -8,7 +8,7 @@ using TqkLibrary.WindowCapture.Interfaces;
 
 namespace TqkLibrary.WindowCapture.Captures
 {
-    public class DesktopDuplicationCapture : BaseCapture, IWindowCapture
+    public class DesktopDuplicationCapture : BaseCapture, IMonitorCapture
     {
 
         [DllImport(_dllName, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
@@ -19,6 +19,6 @@ namespace TqkLibrary.WindowCapture.Captures
         {
         }
 
-        public bool InitWindow(IntPtr hwnd) => BaseCapture_InitWindowCapture(Pointer, hwnd);
+        public bool InitMonitor(IntPtr HMONITOR) => BaseCapture_InitMonitorCapture(Pointer, HMONITOR);
     }
 }
