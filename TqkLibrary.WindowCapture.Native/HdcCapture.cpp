@@ -300,7 +300,7 @@ BOOL HdcCapture::CopyBitmapToTexture(
 	const HDC hdc,
 	ID3D11Device* device,
 	ID3D11DeviceContext* deviceCtx,
-	ComPtr<ID3D11Texture2D>& texture
+	ComPtr<ID3D11Texture2D>& textureBGRA
 )
 {
 	if (!hBitmap || hBitmap == INVALID_HANDLE_VALUE ||
@@ -359,8 +359,8 @@ BOOL HdcCapture::CopyBitmapToTexture(
 		D3D11_TEXTURE2D_DESC texDesc;
 		ZeroMemory(&texDesc, sizeof(D3D11_TEXTURE2D_DESC));
 
-		if (texture.Get())
-			texture->GetDesc(&texDesc);
+		if (textureBGRA.Get())
+			textureBGRA->GetDesc(&texDesc);
 
 		if (texDesc.Width != bitmap.bmWidth ||
 			texDesc.Height != bitmap.bmHeight ||
@@ -379,14 +379,14 @@ BOOL HdcCapture::CopyBitmapToTexture(
 			texDesc.Usage = D3D11_USAGE_DYNAMIC;// D3D11_USAGE_DEFAULT;
 			texDesc.MiscFlags = 0;
 			texDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-			hr = device->CreateTexture2D(&texDesc, NULL, texture.ReleaseAndGetAddressOf());
+			hr = device->CreateTexture2D(&texDesc, NULL, textureBGRA.ReleaseAndGetAddressOf());
 			result = SUCCEEDED(hr);
 			if (!result)
 				goto end;
 		}
 	}
 
-	hr = deviceCtx->Map(texture.Get(), 0, D3D11_MAP::D3D11_MAP_WRITE_DISCARD, 0, &map);
+	hr = deviceCtx->Map(textureBGRA.Get(), 0, D3D11_MAP::D3D11_MAP_WRITE_DISCARD, 0, &map);
 	result = SUCCEEDED(hr);
 	if (result)
 	{
@@ -407,7 +407,7 @@ BOOL HdcCapture::CopyBitmapToTexture(
 				);
 			}
 		}
-		deviceCtx->Unmap(texture.Get(), 0);
+		deviceCtx->Unmap(textureBGRA.Get(), 0);
 	}
 
 end:

@@ -96,9 +96,9 @@ bool InputTextureClass::Initialize(ID3D11Device* device, int width, int height) 
 	return true;
 }
 
-BOOL InputTextureClass::Copy(ID3D11DeviceContext* deviceCtx, ID3D11Texture2D* texture)
+BOOL InputTextureClass::Copy(ID3D11DeviceContext* deviceCtx, ID3D11Texture2D* textureBGRA)
 {
-	deviceCtx->CopyResource(this->m_texture.Get(), texture);
+	deviceCtx->CopyResource(this->m_texture.Get(), textureBGRA);
 	return TRUE;
 }
 

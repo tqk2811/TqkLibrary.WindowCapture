@@ -12,7 +12,7 @@ public:
 	DesktopDuplicationCapture();
 	~DesktopDuplicationCapture();
 
-	BOOL Draw(ID3D11Device* device, ID3D11DeviceContext* deviceCtx, ComPtr<ID3D11Texture2D>& texture);
+	BOOL Draw(ID3D11Device* device, ID3D11DeviceContext* deviceCtx, ComPtr<ID3D11Texture2D>& textureBGRA);
 	HBITMAP Shoot();
 
 	BOOL InitMonitorCapture(HMONITOR hmonitor);

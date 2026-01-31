@@ -47,7 +47,7 @@ private:
 		const HDC hdc,
 		ID3D11Device* device,
 		ID3D11DeviceContext* deviceCtx,
-		ComPtr<ID3D11Texture2D>& texture
+		ComPtr<ID3D11Texture2D>& textureBGRA
 	);
 };
 

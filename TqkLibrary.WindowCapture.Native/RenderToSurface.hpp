@@ -18,7 +18,7 @@ public:
 	BOOL Init();
 
 	BOOL InitializeSurface(IUnknown* surface, bool isNewSurface, bool& isNewtargetView);
-	BOOL SendTexture(ID3D11Texture2D* texture);
+	BOOL SendTexture(ID3D11Texture2D* textureBGRA);
 	BOOL Render();
 
 

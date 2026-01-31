@@ -51,20 +51,20 @@ BOOL RenderToSurface::InitializeSurface(IUnknown* surface, bool isNewSurface, bo
 
 	return result;
 }
-BOOL RenderToSurface::SendTexture(ID3D11Texture2D* texture)
+BOOL RenderToSurface::SendTexture(ID3D11Texture2D* textureBGRA)
 {
 	ComPtr<ID3D11Device> device = this->_d3d.GetDevice();
 	ComPtr<ID3D11DeviceContext> deviceCtx = this->_d3d.GetDeviceContext();
-	if (texture)
+	if (textureBGRA)
 	{
 		D3D11_TEXTURE2D_DESC desc;
-		texture->GetDesc(&desc);
+		textureBGRA->GetDesc(&desc);
 
 		BOOL result = this->_inputTexture.Initialize(device.Get(), desc.Width, desc.Height);
 		if (!result)
 			return FALSE;
 
-		result = this->_inputTexture.Copy(deviceCtx.Get(), texture);
+		result = this->_inputTexture.Copy(deviceCtx.Get(), textureBGRA);
 		if (!result)
 			return FALSE;
 

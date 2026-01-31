@@ -16,7 +16,7 @@ DesktopDuplicationCapture::~DesktopDuplicationCapture()
 
 }
 
-BOOL DesktopDuplicationCapture::Draw(ID3D11Device* device, ID3D11DeviceContext* deviceCtx, ComPtr<ID3D11Texture2D>& texture)
+BOOL DesktopDuplicationCapture::Draw(ID3D11Device* device, ID3D11DeviceContext* deviceCtx, ComPtr<ID3D11Texture2D>& textureBGRA)
 {
 	return NULL;
 }
@@ -30,6 +30,10 @@ BOOL DesktopDuplicationCapture::InitMonitorCapture(HMONITOR hmonitor)
 {
 	if (!hmonitor)
 		return FALSE;
+
+	if (!this->IsValidMonitor(hmonitor))
+		return FALSE;
+
 	this->m_hmonitor = hmonitor;
 	return TRUE;
 }

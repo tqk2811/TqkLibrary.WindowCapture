@@ -14,7 +14,7 @@ public:
 	void Shutdown();
 
 	ID3D11ShaderResourceView* GetView();
-	BOOL Copy(ID3D11DeviceContext* deviceCtx, ID3D11Texture2D* texture);
+	BOOL Copy(ID3D11DeviceContext* deviceCtx, ID3D11Texture2D* textureBGRA);
 
 	int Width();
 	int Height();
