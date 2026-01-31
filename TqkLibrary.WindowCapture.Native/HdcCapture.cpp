@@ -207,7 +207,7 @@ HBITMAP HdcCapture::CaptureToHBitmap(HdcCaptureMode mode)
 	{
 		MONITORINFO mi = { sizeof(MONITORINFO) };
 		if (!GetMonitorInfo(this->m_hmonitor, &mi))
-			return NULL;
+			goto end;
 		srcX = mi.rcMonitor.left;
 		srcY = mi.rcMonitor.top;
 		width = mi.rcMonitor.right - mi.rcMonitor.left;
@@ -283,7 +283,13 @@ HBITMAP HdcCapture::CaptureToHBitmap(HdcCaptureMode mode)
 end:
 	SetThreadDpiAwarenessContext(oldContext);
 	if (hdcDest) DeleteDC(hdcDest);
-	if (hdcSource) ReleaseDC(this->m_hwnd, hdcSource);
+	if (hdcSource) 
+	{
+		if (this->m_hmonitor)
+			ReleaseDC(NULL, hdcSource);
+		else if (this->m_hwnd)
+			ReleaseDC(this->m_hwnd, hdcSource);
+	}
 	if (isSuccess) return hBitmap;
 	if (hBitmap) DeleteObject(hBitmap);
 	return NULL;
