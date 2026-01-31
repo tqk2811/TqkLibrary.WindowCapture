@@ -35,7 +35,11 @@ namespace TqkLibrary.WindowCapture.Captures
             set { HdcCapture_SetMode(Pointer, value); }
         }
         public bool InitWindow(IntPtr hwnd) => BaseCapture_InitWindowCapture(Pointer, hwnd);
-        public bool InitMonitor(IntPtr HMONITOR) => BaseCapture_InitMonitorCapture(Pointer, HMONITOR);
+        public bool InitMonitor(IntPtr HMONITOR)
+        {
+            if (Mode == HdcCaptureMode.PrintWindow) throw new InvalidOperationException($"Mode {nameof(HdcCaptureMode.PrintWindow)} not support capture Monitor");
+            return BaseCapture_InitMonitorCapture(Pointer, HMONITOR);
+        }
 
     }
 }

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Media;
 using TqkLibrary.WinApi.Helpers;
+using TqkLibrary.WindowCapture;
 using TqkLibrary.WpfUi;
 
 namespace WpfTest
@@ -53,20 +54,24 @@ namespace WpfTest
 
 
 
-        public ObservableCollection<WindowHelper> Windows { get; } = new ObservableCollection<WindowHelper>();
-        WindowHelper? _WindowHelperSelected = null;
-        public WindowHelper? WindowHelperSelected
+        public ObservableCollection<WindowOrMonitorItem> WindowOrMonitors { get; } = new ObservableCollection<WindowOrMonitorItem>();
+        WindowOrMonitorItem? _WindowOrMonitorSelected = null;
+        public WindowOrMonitorItem? WindowOrMonitorSelected
         {
-            get { return _WindowHelperSelected; }
-            set { _WindowHelperSelected = value; NotifyPropertyChange(); }
+            get { return _WindowOrMonitorSelected; }
+            set { _WindowOrMonitorSelected = value; NotifyPropertyChange(); }
         }
         public BaseCommand RefreshWindowCommand { get; }
         void _RefreshWindowCommand()
         {
-            Windows.Clear();
+            WindowOrMonitors.Clear();
+            foreach (var item in BaseCapture.Monitors)
+            {
+                WindowOrMonitors.Add(new(item));
+            }
             foreach (var item in WindowHelper.AllAltTabWindows)
             {
-                Windows.Add(item);
+                WindowOrMonitors.Add(new(item));
             }
         }
     }

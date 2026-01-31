@@ -12,6 +12,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using TqkLibrary.WinApi;
+using TqkLibrary.WinApi.Helpers;
 using TqkLibrary.WindowCapture;
 using TqkLibrary.WindowCapture.Captures;
 using TqkLibrary.WindowCapture.Interfaces;
@@ -143,13 +144,12 @@ namespace WpfTest
 
         private async void cbb_windows_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (_mainWVM.WindowHelperSelected is not null)
+            if (_mainWVM.WindowOrMonitorSelected is not null)
             {
-                IntPtr intPtr = _mainWVM.WindowHelperSelected.WindowHandle;
                 this.Cursor = Cursors.Wait;
 
-                await InitAsync(_baseCapture_Render, intPtr);
-                await InitAsync(_baseCapture_Shoot, intPtr);
+                await InitAsync(_baseCapture_Render, _mainWVM.WindowOrMonitorSelected);
+                await InitAsync(_baseCapture_Shoot, _mainWVM.WindowOrMonitorSelected);
 
                 this.Cursor = null;
             }
@@ -161,12 +161,11 @@ namespace WpfTest
             _baseCapture_Render = null;
 
             _baseCapture_Render = CreateCapture(_mainWVM.RenderSelected);
-            if (_mainWVM.WindowHelperSelected is not null)
+            if (_mainWVM.WindowOrMonitorSelected is not null)
             {
-                IntPtr intPtr = _mainWVM.WindowHelperSelected.WindowHandle;
                 this.Cursor = Cursors.Wait;
 
-                await InitAsync(_baseCapture_Render, intPtr);
+                await InitAsync(_baseCapture_Render, _mainWVM.WindowOrMonitorSelected);
 
                 this.Cursor = null;
             }
@@ -179,12 +178,11 @@ namespace WpfTest
             _baseCapture_Shoot = null;
 
             _baseCapture_Shoot = CreateCapture(_mainWVM.CaptureImageSelected);
-            if (_mainWVM.WindowHelperSelected is not null)
+            if (_mainWVM.WindowOrMonitorSelected is not null)
             {
-                IntPtr intPtr = _mainWVM.WindowHelperSelected.WindowHandle;
                 this.Cursor = Cursors.Wait;
 
-                await InitAsync(_baseCapture_Shoot, intPtr);
+                await InitAsync(_baseCapture_Shoot, _mainWVM.WindowOrMonitorSelected);
 
                 this.Cursor = null;
             }
@@ -219,11 +217,15 @@ namespace WpfTest
                 SetProp(winrtGraphicCapture);
             }
         }
-        async Task InitAsync(ICapture? capture, IntPtr hwnd)
+        async Task InitAsync(ICapture? capture, WindowOrMonitorItem item)
         {
-            if (capture is IWindowCapture windowCapture)
+            if (capture is IWindowCapture windowCapture && item.WindowHelper is not null)
             {
-                windowCapture.InitWindow(hwnd);
+                windowCapture.InitWindow(item.WindowHelper.WindowHandle);
+            }
+            if (capture is IMonitorCapture monitorCapture && item.HMonitor is not null)
+            {
+                monitorCapture.InitMonitor(item.HMonitor.Value);
             }
             if (capture is WinrtGraphicCapture winrtGraphicCapture)
             {

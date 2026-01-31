@@ -2,7 +2,10 @@
 using System.Drawing.Imaging;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Threading;
 using TqkLibrary.WindowCapture.Interfaces;
+using Windows.Win32.Foundation;
+using Windows.Win32.Graphics.Gdi;
 
 namespace TqkLibrary.WindowCapture
 {
@@ -35,6 +38,49 @@ namespace TqkLibrary.WindowCapture
 
         [DllImport(_dllName, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
         protected static extern bool BaseCapture_Render(IntPtr pointer, IntPtr surface, bool isNewSurface, ref bool isNewtargetView);
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public static IEnumerable<IntPtr> Monitors
+        {
+            get
+            {
+                foreach (var hmonitor in HMonitors)
+                {
+                    yield return hmonitor;
+                }
+            }
+        }
+        internal unsafe static IEnumerable<HMONITOR> HMonitors
+        {
+            get
+            {
+                List<HMONITOR> monitors = new List<HMONITOR>();
+                GCHandle gch = GCHandle.Alloc(monitors);
+                try
+                {
+                    RECT? rect = null;
+                    MONITORENUMPROC proc = MonitorCallback;
+                    BOOL bOOL = Windows.Win32.PInvoke.EnumDisplayMonitors(new HDC(IntPtr.Zero), rect, proc, GCHandle.ToIntPtr(gch));
+                }
+                finally
+                {
+                    if (gch.IsAllocated)
+                        gch.Free();
+                }
+                return monitors;
+            }
+        }
+        unsafe static BOOL MonitorCallback(HMONITOR param0, HDC param1, RECT* param2, LPARAM param3)
+        {
+            var list = GCHandle.FromIntPtr(param3).Target as List<HMONITOR>;
+            list?.Add(param0);
+            return true;
+        }
+
+
 
 
 

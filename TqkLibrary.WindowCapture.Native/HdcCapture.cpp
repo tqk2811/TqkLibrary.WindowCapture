@@ -50,7 +50,23 @@ BOOL HdcCapture::InitWindowCapture(HWND hwnd)
 		return FALSE;
 
 	this->m_hwnd = hwnd;
+	this->m_hmonitor = NULL;
 
+	return TRUE;
+}
+BOOL HdcCapture::InitMonitorCapture(HMONITOR hmonitor)
+{
+	if (!this->_hdc)
+		return FALSE;
+
+	if (!this->_renderToSurface.Init())
+		return FALSE;
+
+	if (!this->IsValidMonitor(hmonitor))
+		return FALSE;
+
+	this->m_hmonitor = hmonitor;
+	this->m_hwnd = NULL;
 	return TRUE;
 }
 
@@ -176,6 +192,7 @@ HBITMAP HdcCapture::CaptureToHBitmap(HdcCaptureMode mode)
 	BOOL isSuccess = FALSE;
 	int width;
 	int height;
+	int srcX = 0, srcY = 0;
 
 	//release
 	HDC hdcSource{ 0 };
@@ -183,13 +200,25 @@ HBITMAP HdcCapture::CaptureToHBitmap(HdcCaptureMode mode)
 
 	//return
 	HBITMAP hBitmap{ 0 };
+	HGDIOBJ oldBitmap = NULL;
 
-
-	hdcSource = GetDC(this->m_hwnd);
-	if (!hdcSource)
-		goto end;
-
+	DPI_AWARENESS_CONTEXT oldContext = SetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
+	if (this->m_hmonitor)
 	{
+		MONITORINFO mi = { sizeof(MONITORINFO) };
+		if (!GetMonitorInfo(this->m_hmonitor, &mi))
+			return NULL;
+		srcX = mi.rcMonitor.left;
+		srcY = mi.rcMonitor.top;
+		width = mi.rcMonitor.right - mi.rcMonitor.left;
+		height = mi.rcMonitor.bottom - mi.rcMonitor.top;
+
+		hdcSource = GetDC(NULL);
+	}
+	else if (this->m_hwnd)
+	{
+		hdcSource = GetDC(this->m_hwnd);
+
 #ifdef __CheckBitmap__
 		HGDIOBJ srcHbitmap;
 		srcHbitmap = GetCurrentObject(hdcSource, OBJ_BITMAP);
@@ -209,6 +238,10 @@ HBITMAP HdcCapture::CaptureToHBitmap(HdcCaptureMode mode)
 		height = rcClient.bottom - rcClient.top;
 #endif
 	}
+	else goto end;
+
+	if (!hdcSource)
+		goto end;
 
 	hdcDest = CreateCompatibleDC(hdcSource);
 	if (!hdcDest)
@@ -218,8 +251,7 @@ HBITMAP HdcCapture::CaptureToHBitmap(HdcCaptureMode mode)
 	if (!hBitmap)
 		goto end;
 
-	if (!SelectObject(hdcDest, hBitmap))
-		goto end;
+	oldBitmap = SelectObject(hdcDest, hBitmap);
 
 	//SetMapMode(hdcDest, MM_LOENGLISH);
 	//SetStretchBltMode(hdcDest, COLORONCOLOR);
@@ -227,39 +259,33 @@ HBITMAP HdcCapture::CaptureToHBitmap(HdcCaptureMode mode)
 	switch (mode)
 	{
 	case HdcCaptureMode::HdcCaptureMode_BitBlt:
-		if (!BitBlt(hdcDest, 0, 0, width, height, hdcSource, 0, 0, SRCCOPY))
+		if (!BitBlt(hdcDest, 0, 0, width, height, hdcSource, srcX, srcY, SRCCOPY))
 			goto end;
 		isSuccess = TRUE;
 		break;
 
-	case HdcCaptureMode::HdcCaptureMode_PrintWindow:
-		if (!PrintWindow(this->m_hwnd, hdcDest, 0))
-			goto end;
-		isSuccess = TRUE;
+	case HdcCaptureMode::HdcCaptureMode_PrintWindow://PrintWindow only work with HWND
+		if (this->m_hwnd)
+		{
+			if (!PrintWindow(this->m_hwnd, hdcDest, 0))
+				goto end;
+			isSuccess = TRUE;
+		}
 		break;
 
 	default:
 		goto end;
 	}
 
-	if (!SelectObject(hdcDest, hBitmap))
-		goto end;
+	if (oldBitmap) SelectObject(hdcDest, oldBitmap);
 
 end:
-	if (hdcDest)
-		DeleteDC(hdcDest);
-	if (hdcSource)
-		ReleaseDC(this->m_hwnd, hdcSource);
-	if (isSuccess)
-	{
-		return hBitmap;
-	}
-	else
-	{
-		if (hBitmap)
-			DeleteObject(hBitmap);
-		return NULL;
-	}
+	SetThreadDpiAwarenessContext(oldContext);
+	if (hdcDest) DeleteDC(hdcDest);
+	if (hdcSource) ReleaseDC(this->m_hwnd, hdcSource);
+	if (isSuccess) return hBitmap;
+	if (hBitmap) DeleteObject(hBitmap);
+	return NULL;
 }
 
 BOOL HdcCapture::CopyBitmapToTexture(

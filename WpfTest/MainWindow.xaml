@@ -18,9 +18,8 @@
             <st:StackPanel VerticalAlignment="Top" HorizontalAlignment="Left" Orientation="Vertical" Width="150" MarginBetweenChildren="5">
                 <Button Content="Refresh" Command="{Binding RefreshWindowCommand}"/>
                 <ComboBox x:Name="cbb_windows" 
-                          ItemsSource="{Binding Windows}" 
-                          SelectedItem="{Binding WindowHelperSelected}" 
-                          DisplayMemberPath="Title" 
+                          ItemsSource="{Binding WindowOrMonitors}" 
+                          SelectedItem="{Binding WindowOrMonitorSelected}" 
                           SelectionChanged="cbb_windows_SelectionChanged"
                           />
                 <ComboBox x:Name="cbb_renderMode" 
