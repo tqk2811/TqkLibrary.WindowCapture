@@ -36,9 +36,18 @@ private:
 	HMONITOR m_hmonitor{ 0 };
 
 	HDC _hdc{ 0 };
+	HDC _hdcDest{ 0 };  // Cached compatible DC for reuse
 	HdcCaptureMode _mode{ HdcCaptureMode_BitBlt };
 	RenderToSurface _renderToSurface;
 	ComPtr<ID3D11Texture2D> _renderTexture{ NULL };
+
+	// Buffer pooling for bitmap data
+	BYTE* _pBitmapBuffer{ nullptr };
+	DWORD _bufferSize{ 0 };
+	
+	// Track size changes
+	UINT32 _lastWidth{ 0 };
+	UINT32 _lastHeight{ 0 };
 
 	HBITMAP CaptureToHBitmap(HdcCaptureMode mode);
 

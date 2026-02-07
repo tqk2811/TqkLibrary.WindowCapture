@@ -27,6 +27,15 @@ HdcCapture::~HdcCapture()
 	if (_hdc)
 		DeleteDC(_hdc);
 	_hdc = NULL;
+	
+	if (_hdcDest)
+		DeleteDC(_hdcDest);
+	_hdcDest = NULL;
+	
+	if (_pBitmapBuffer)
+		delete[] _pBitmapBuffer;
+	_pBitmapBuffer = nullptr;
+	_bufferSize = 0;
 }
 
 HdcCaptureMode HdcCapture::GetMode()
@@ -49,6 +58,17 @@ BOOL HdcCapture::InitWindowCapture(HWND hwnd)
 	if (!IsValidWindow(hwnd))
 		return FALSE;
 
+	// Reset cached resources on re-initialization
+	if (_hdcDest)
+	{
+		DeleteDC(_hdcDest);
+		_hdcDest = NULL;
+	}
+	
+	// Note: Keep buffer allocated, it will resize if needed
+	_lastWidth = 0;
+	_lastHeight = 0;
+
 	this->m_hwnd = hwnd;
 	this->m_hmonitor = NULL;
 
@@ -64,6 +84,17 @@ BOOL HdcCapture::InitMonitorCapture(HMONITOR hmonitor)
 
 	if (!this->_renderToSurface.Init())
 		return FALSE;
+
+	// Reset cached resources on re-initialization
+	if (_hdcDest)
+	{
+		DeleteDC(_hdcDest);
+		_hdcDest = NULL;
+	}
+	
+	// Note: Keep buffer allocated, it will resize if needed
+	_lastWidth = 0;
+	_lastHeight = 0;
 
 	this->m_hmonitor = hmonitor;
 	this->m_hwnd = NULL;
@@ -243,9 +274,14 @@ HBITMAP HdcCapture::CaptureToHBitmap(HdcCaptureMode mode)
 	if (!hdcSource)
 		goto end;
 
-	hdcDest = CreateCompatibleDC(hdcSource);
-	if (!hdcDest)
-		goto end;
+	// Reuse cached DC or create new one
+	if (!_hdcDest)
+	{
+		_hdcDest = CreateCompatibleDC(hdcSource);
+		if (!_hdcDest)
+			goto end;
+	}
+	hdcDest = _hdcDest;
 
 	hBitmap = CreateCompatibleBitmap(hdcSource, width, height);
 	if (!hBitmap)
@@ -282,7 +318,8 @@ HBITMAP HdcCapture::CaptureToHBitmap(HdcCaptureMode mode)
 
 end:
 	SetThreadDpiAwarenessContext(oldContext);
-	if (hdcDest) DeleteDC(hdcDest);
+	// Don't delete cached DC
+	//if (hdcDest) DeleteDC(hdcDest);
 	if (hdcSource) 
 	{
 		if (this->m_hmonitor)
@@ -320,17 +357,12 @@ BOOL HdcCapture::CopyBitmapToTexture(
 	//release
 	void* pData{ nullptr };
 
-	{
-		HGDIOBJ obj = SelectObject(hdc, hBitmap);
-		result = obj != NULL;
-		if (!result)
-			goto end;
-	}
+	// Note: SelectObject already called by caller (Render or CaptureImage)
+	// No need to select again here
 
 	result = GetObject(hBitmap, sizeof(BITMAP), &bitmap) == sizeof(BITMAP);
 	if (!result)
 		goto end;
-
 
 	bi.biSize = sizeof(BITMAPINFOHEADER);
 	bi.biWidth = bitmap.bmWidth;
@@ -345,7 +377,16 @@ BOOL HdcCapture::CopyBitmapToTexture(
 	bi.biClrImportant = 0;
 
 	dwBmpSize = bitmap.bmWidth * 4 * bitmap.bmHeight;
-	pData = new BYTE[dwBmpSize];
+
+	// Reuse buffer or allocate if needed
+	if (_bufferSize < dwBmpSize)
+	{
+		if (_pBitmapBuffer)
+			delete[] _pBitmapBuffer;
+		_pBitmapBuffer = new BYTE[dwBmpSize];
+		_bufferSize = dwBmpSize;
+	}
+	pData = _pBitmapBuffer;
 
 	result = GetDIBits(hdc, hBitmap, 0,
 		(UINT)bitmap.bmHeight,
@@ -364,7 +405,7 @@ BOOL HdcCapture::CopyBitmapToTexture(
 
 		if (texDesc.Width != bitmap.bmWidth ||
 			texDesc.Height != bitmap.bmHeight ||
-			(texDesc.BindFlags & D3D11_BIND_SHADER_RESOURCE) != D3D11_BIND_SHADER_RESOURCE &&
+			(texDesc.BindFlags & D3D11_BIND_SHADER_RESOURCE) != D3D11_BIND_SHADER_RESOURCE ||
 			texDesc.Usage != D3D11_USAGE_DYNAMIC ||
 			texDesc.CPUAccessFlags != D3D11_CPU_ACCESS_WRITE)
 		{
@@ -411,7 +452,8 @@ BOOL HdcCapture::CopyBitmapToTexture(
 	}
 
 end:
-	if (pData)
-		delete[] pData;
+	// Don't delete buffer - it's reused
+	//if (pData)
+	//	delete[] pData;
 	return result;
 }
