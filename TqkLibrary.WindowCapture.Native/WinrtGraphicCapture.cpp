@@ -291,7 +291,7 @@ VOID WinrtGraphicCapture::OnFrameArrived(
 
 	// Mark callback as completed
 	_activeCallbacks--;
-	
+
 	// Always notify - wait() will check the predicate anyway
 	// This prevents race condition where notify could be missed
 	_cv_callbacksComplete.notify_all();
@@ -400,9 +400,13 @@ VOID WinrtGraphicCapture::Close()
 		m_frameArrived.revoke();
 
 		// Wait for all active callbacks to finish using condition variable
-		_cv_callbacksComplete.wait(_mtx_lockInstance, [this]() {
-			return _activeCallbacks.load() == 0;
-		});
+		_cv_callbacksComplete.wait_for(
+			_mtx_lockInstance, 
+			std::chrono::milliseconds(100), 
+			[this]() {
+				return _activeCallbacks.load() == 0;
+			}
+		);
 
 		// Close session to stop capture
 		if (m_session)
