@@ -173,10 +173,37 @@ VOID WinrtGraphicCapture::OnFrameArrived(
 	winrt::Windows::Graphics::Capture::Direct3D11CaptureFramePool const& sender,
 	winrt::Windows::Foundation::IInspectable const&)
 {
+	// Early exit if not capturing - avoid unnecessary work
+	if (!_isCapturing)
+		return;
+
 	_mtx_lockInstance.lock();
 	if (_isCapturing)
 	{
 		auto frame = m_framePool.TryGetNextFrame();
+		if (!frame)
+		{
+			_mtx_lockInstance.unlock();
+			return;
+		}
+
+		auto frameTime = frame.SystemRelativeTime();
+
+		// Throttling: Skip frame if not enough time has passed since last processed frame
+		if (m_delay > 0 && m_lastProcessedTime.count() > 0)
+		{
+			auto timeSinceLastFrame = frameTime.count() - m_lastProcessedTime.count();
+			auto delayInHundredNanoseconds = static_cast<int64_t>(m_delay) * 10000; // Convert ms to 100ns units
+
+			if (timeSinceLastFrame < delayInHundredNanoseconds)
+			{
+				// Skip this frame - it arrived too quickly
+				frame.Close();
+				_mtx_lockInstance.unlock();
+				return;
+			}
+		}
+
 		auto newSize = false;
 		auto frameContentSize = frame.ContentSize();
 		if (frameContentSize.Width != m_lastSize.Width ||
@@ -235,7 +262,8 @@ VOID WinrtGraphicCapture::OnFrameArrived(
 		if (SUCCEEDED(hr))
 		{
 			d3dDeviceCtx->CopyResource(_tmpFrame.Get(), frameSurface.get());
-			m_lastTime = frame.SystemRelativeTime();
+			m_lastTime = frameTime;
+			m_lastProcessedTime = frameTime;  // Update last processed time
 		}
 
 		if (newSize)
@@ -247,7 +275,7 @@ VOID WinrtGraphicCapture::OnFrameArrived(
 				m_lastSize);
 		}
 
-		Sleep(m_delay);
+		// No more Sleep - frame throttling is done via timestamp checking above
 
 		frame.Close();
 	}

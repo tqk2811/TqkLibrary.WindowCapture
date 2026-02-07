@@ -79,6 +79,7 @@ private:
 	std::recursive_mutex _mtx_lockFrame;
 
 	UINT32 m_delay{ 0 };
+	winrt::Windows::Foundation::TimeSpan m_lastProcessedTime{ 0 };  // Track last processed frame time for throttling
 	ComPtr<ID3D11Texture2D> _tmpFrame{ nullptr };
 	BOOL m_isSetCursorState{ TRUE };
 	BOOL m_isSetBorderState{ TRUE };
