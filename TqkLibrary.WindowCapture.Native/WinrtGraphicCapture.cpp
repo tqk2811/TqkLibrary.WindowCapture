@@ -173,9 +173,17 @@ VOID WinrtGraphicCapture::OnFrameArrived(
 	winrt::Windows::Graphics::Capture::Direct3D11CaptureFramePool const& sender,
 	winrt::Windows::Foundation::IInspectable const&)
 {
-	// Early exit if not capturing - avoid unnecessary work
+	// Mark callback as active FIRST to ensure balanced increment/decrement
+	// This prevents deadlock where Close() waits forever if callback returns early
+	_activeCallbacks++;
+
+	// Early exit if not capturing - but still need to decrement counter
 	if (!_isCapturing)
+	{
+		_activeCallbacks--;
+		_cv_callbacksComplete.notify_all();
 		return;
+	}
 
 	_mtx_lockInstance.lock();
 	if (_isCapturing)
@@ -280,6 +288,13 @@ VOID WinrtGraphicCapture::OnFrameArrived(
 		frame.Close();
 	}
 	_mtx_lockInstance.unlock();
+
+	// Mark callback as completed
+	_activeCallbacks--;
+	
+	// Always notify - wait() will check the predicate anyway
+	// This prevents race condition where notify could be missed
+	_cv_callbacksComplete.notify_all();
 }
 
 BOOL WinrtGraphicCapture::Render(IDXGISurface* surface, bool isNewSurface, bool& isNewtargetView)
@@ -383,6 +398,11 @@ VOID WinrtGraphicCapture::Close()
 
 		// Revoke frame callback first to stop new frames
 		m_frameArrived.revoke();
+
+		// Wait for all active callbacks to finish using condition variable
+		_cv_callbacksComplete.wait(_mtx_lockInstance, [this]() {
+			return _activeCallbacks.load() == 0;
+		});
 
 		// Close session to stop capture
 		if (m_session)

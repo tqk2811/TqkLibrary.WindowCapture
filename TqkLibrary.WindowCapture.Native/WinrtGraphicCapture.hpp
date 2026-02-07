@@ -26,6 +26,7 @@
 #endif
 #include <mutex>
 #include <atomic>
+#include <condition_variable>
 
 class WinrtGraphicCapture : public BaseCapture
 {
@@ -75,6 +76,8 @@ private:
 	winrt::Windows::Graphics::Capture::Direct3D11CaptureFramePool::FrameArrived_revoker m_frameArrived;
 
 	std::atomic<bool> _isCapturing{ false };
+	std::atomic<int> _activeCallbacks{ 0 };
+	std::condition_variable_any _cv_callbacksComplete;
 	std::recursive_mutex _mtx_lockInstance;
 	std::recursive_mutex _mtx_lockFrame;
 
