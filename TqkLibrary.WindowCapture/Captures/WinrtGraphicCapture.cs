@@ -81,10 +81,6 @@ https://jrsoftware.org/ishelp/index.php?topic=winvernotes
         {
 
         }
-        protected override void Dispose(bool disposing)
-        {
-            Task.Factory.StartNew(() => base.Dispose(disposing), TaskCreationOptions.LongRunning).Wait();
-        }
 
         /// <summary>
         /// 0 is no limit
