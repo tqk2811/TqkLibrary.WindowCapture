@@ -29,7 +29,11 @@ WinrtGraphicCapture::WinrtGraphicCapture()
 WinrtGraphicCapture::~WinrtGraphicCapture()
 {
 	Close();
+
+	// Ensure all callbacks are completed before final cleanup
+	_mtx_lockFrame.lock();
 	_tmpFrame.Reset();
+	_mtx_lockFrame.unlock();
 }
 INT32 WinrtGraphicCapture::GetDelay()
 {
@@ -151,7 +155,7 @@ BOOL WinrtGraphicCapture::InitMonitorCapture(HMONITOR HMONITOR)
 
 		m_session.StartCapture();
 
-		_isCapturing = TRUE;
+		_isCapturing = true;
 	}
 
 	_mtx_lockInstance.unlock();
@@ -220,11 +224,13 @@ VOID WinrtGraphicCapture::OnFrameArrived(
 			hr = d3dDevice->CreateTexture2D(&desc, NULL, tmpFrame.GetAddressOf());
 
 			_mtx_lockFrame.lock();
-
-			_tmpFrame.Reset();
+			// Atomic swap to prevent race condition
+			ComPtr<ID3D11Texture2D> oldFrame = _tmpFrame;
 			_tmpFrame = tmpFrame.Get();
-
 			_mtx_lockFrame.unlock();
+
+			// Release old frame outside lock
+			oldFrame.Reset();
 		}
 		if (SUCCEEDED(hr))
 		{
@@ -332,6 +338,10 @@ BOOL WinrtGraphicCapture::CaptureImage(void* data, UINT32 width, UINT32 height, 
 }
 VOID WinrtGraphicCapture::OnCaptureItemClosed(winrt::Windows::Graphics::Capture::GraphicsCaptureItem const& sender, winrt::Windows::Foundation::IInspectable const& args)
 {
+	// Prevent recursive calls - if already closing, return immediately
+	if (!_isCapturing.exchange(false))
+		return;
+
 	this->Close();
 }
 VOID WinrtGraphicCapture::Close()
@@ -340,25 +350,45 @@ VOID WinrtGraphicCapture::Close()
 
 	if (_isCapturing)
 	{
-		m_item.Closed(m_closedToken);
-		m_frameArrived.revoke();
-		if (m_session)
-			m_session.Close();
-		m_session = nullptr;
-		m_item = nullptr;
+		// Set flag first to prevent new operations
+		_isCapturing = false;
 
+		// Revoke frame callback first to stop new frames
+		m_frameArrived.revoke();
+
+		// Close session to stop capture
+		if (m_session)
+		{
+			try { m_session.Close(); }
+			catch (...) { /* Ignore errors during cleanup */ }
+		}
+
+		// Close frame pool
 		if (m_framePool)
-			m_framePool.Close();
+		{
+			try { m_framePool.Close(); }
+			catch (...) { /* Ignore errors during cleanup */ }
+		}
+
+		// Unregister closed event only if item is valid and token is set
+		if (m_item && m_closedToken.value != 0)
+		{
+			try { m_item.Closed(m_closedToken); }
+			catch (...) { /* Ignore errors during cleanup */ }
+		}
+
+		// Clear references
+		m_session = nullptr;
 		m_framePool = nullptr;
+		m_item = nullptr;
+		m_closedToken = {};
 	}
-	_isCapturing = FALSE;
 
 	_mtx_lockInstance.unlock();
 
+	// Clear frame buffer outside instance lock to prevent deadlock
 	_mtx_lockFrame.lock();
-
 	_tmpFrame.Reset();
-
 	_mtx_lockFrame.unlock();
 }
 

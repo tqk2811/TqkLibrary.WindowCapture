@@ -25,6 +25,7 @@
 #define _DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR
 #endif
 #include <mutex>
+#include <atomic>
 
 class WinrtGraphicCapture : public BaseCapture
 {
@@ -73,7 +74,7 @@ private:
 	winrt::Windows::Graphics::Capture::GraphicsCaptureSession m_session{ NULL };
 	winrt::Windows::Graphics::Capture::Direct3D11CaptureFramePool::FrameArrived_revoker m_frameArrived;
 
-	BOOL _isCapturing = FALSE;
+	std::atomic<bool> _isCapturing{ false };
 	std::recursive_mutex _mtx_lockInstance;
 	std::recursive_mutex _mtx_lockFrame;
 
