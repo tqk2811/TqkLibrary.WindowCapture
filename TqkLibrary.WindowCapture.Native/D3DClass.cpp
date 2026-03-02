@@ -70,10 +70,12 @@ ComPtr<ID3D11DeviceContext> D3DClass::GetDeviceContext() {
 
 ComPtr<IDXGIDevice> D3DClass::GetDXGIDevice() {
 	ComPtr<IDXGIDevice> dxgiDevice;
+	if (!m_device.Get())
+		return dxgiDevice;
 	HRESULT hr = m_device->QueryInterface<IDXGIDevice>(dxgiDevice.GetAddressOf());
 	if (FAILED(hr))
 	{
-		throw -1;
+		return ComPtr<IDXGIDevice>();
 	}
 	return dxgiDevice;
 }
