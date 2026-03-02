@@ -31,9 +31,10 @@ WinrtGraphicCapture::~WinrtGraphicCapture()
 	Close();
 
 	// Ensure all callbacks are completed before final cleanup
-	_mtx_lockFrame.lock();
-	_tmpFrame.Reset();
-	_mtx_lockFrame.unlock();
+	{
+		std::lock_guard<std::recursive_mutex> lockFrame(_mtx_lockFrame);
+		_tmpFrame.Reset();
+	}
 }
 INT32 WinrtGraphicCapture::GetDelay()
 {
@@ -72,43 +73,43 @@ BOOL WinrtGraphicCapture::InitWindowCapture(HWND hwnd)
 	if (!IsValidWindow(hwnd))
 		return FALSE;
 
-	_mtx_lockInstance.lock();
-
-	//create new
-	auto activation_factory = winrt::get_activation_factory<winrt::Windows::Graphics::Capture::GraphicsCaptureItem>();
-	auto interop_factory = activation_factory.as<IGraphicsCaptureItemInterop>();
-
-	HRESULT hresult = interop_factory->CreateForWindow(
-		hwnd,
-		winrt::guid_of<ABI::Windows::Graphics::Capture::IGraphicsCaptureItem>(),
-		reinterpret_cast<void**>(winrt::put_abi(m_item))
-	);
-
-	if (SUCCEEDED(hresult))
 	{
-		m_closedToken = m_item.Closed({ this, &WinrtGraphicCapture::OnCaptureItemClosed });
+		std::lock_guard<std::recursive_mutex> lock(_mtx_lockInstance);
 
-		m_lastSize = m_item.Size();
+		//create new
+		auto activation_factory = winrt::get_activation_factory<winrt::Windows::Graphics::Capture::GraphicsCaptureItem>();
+		auto interop_factory = activation_factory.as<IGraphicsCaptureItemInterop>();
 
-		m_framePool = winrt::Windows::Graphics::Capture::Direct3D11CaptureFramePool::CreateFreeThreaded(
-			m_direct3d_device,
-			winrt::Windows::Graphics::DirectX::DirectXPixelFormat::B8G8R8A8UIntNormalized,
-			FramePool_NUMBER_BUFFER,
-			m_lastSize);//not work with D3D11_CREATE_DEVICE_SINGLETHREADED
-		m_session = m_framePool.CreateCaptureSession(m_item);
-		m_frameArrived = m_framePool.FrameArrived(winrt::auto_revoke, { this, &WinrtGraphicCapture::OnFrameArrived });
+		HRESULT hresult = interop_factory->CreateForWindow(
+			hwnd,
+			winrt::guid_of<ABI::Windows::Graphics::Capture::IGraphicsCaptureItem>(),
+			reinterpret_cast<void**>(winrt::put_abi(m_item))
+		);
 
-		if (WinrtGraphicCapture_IsCaptureCursorToggleSupported() && m_isSetCursorState != TRUE)
-			m_session.IsCursorCaptureEnabled(m_isSetCursorState);
-		if (WinrtGraphicCapture_IsBorderToggleSupported() && m_isSetBorderState != TRUE)
-			m_session.IsBorderRequired(m_isSetBorderState);
+		if (SUCCEEDED(hresult))
+		{
+			m_closedToken = m_item.Closed({ this, &WinrtGraphicCapture::OnCaptureItemClosed });
 
-		m_session.StartCapture();
+			m_lastSize = m_item.Size();
 
-		_isCapturing = TRUE;
+			m_framePool = winrt::Windows::Graphics::Capture::Direct3D11CaptureFramePool::CreateFreeThreaded(
+				m_direct3d_device,
+				winrt::Windows::Graphics::DirectX::DirectXPixelFormat::B8G8R8A8UIntNormalized,
+				FramePool_NUMBER_BUFFER,
+				m_lastSize);//not work with D3D11_CREATE_DEVICE_SINGLETHREADED
+			m_session = m_framePool.CreateCaptureSession(m_item);
+			m_frameArrived = m_framePool.FrameArrived(winrt::auto_revoke, { this, &WinrtGraphicCapture::OnFrameArrived });
+
+			if (WinrtGraphicCapture_IsCaptureCursorToggleSupported() && m_isSetCursorState != TRUE)
+				m_session.IsCursorCaptureEnabled(m_isSetCursorState);
+			if (WinrtGraphicCapture_IsBorderToggleSupported() && m_isSetBorderState != TRUE)
+				m_session.IsBorderRequired(m_isSetBorderState);
+
+			m_session.StartCapture();
+
+			_isCapturing = TRUE;
+		}
 	}
-
-	_mtx_lockInstance.unlock();
 
 	return TRUE;
 }
@@ -124,41 +125,41 @@ BOOL WinrtGraphicCapture::InitMonitorCapture(HMONITOR HMONITOR)
 	if (!IsValidMonitor(HMONITOR))
 		return FALSE;
 
-	_mtx_lockInstance.lock();
-
-	auto activation_factory = winrt::get_activation_factory<winrt::Windows::Graphics::Capture::GraphicsCaptureItem>();
-	auto interop_factory = activation_factory.as<IGraphicsCaptureItemInterop>();
-
-	HRESULT hresult = interop_factory->CreateForMonitor(
-		HMONITOR,
-		winrt::guid_of<ABI::Windows::Graphics::Capture::IGraphicsCaptureItem>(),
-		reinterpret_cast<void**>(winrt::put_abi(m_item))
-	);
-
-	if (SUCCEEDED(hresult))
 	{
-		m_closedToken = m_item.Closed({ this, &WinrtGraphicCapture::OnCaptureItemClosed });
-		m_lastSize = m_item.Size();
+		std::lock_guard<std::recursive_mutex> lock(_mtx_lockInstance);
 
-		m_framePool = winrt::Windows::Graphics::Capture::Direct3D11CaptureFramePool::CreateFreeThreaded(
-			m_direct3d_device,
-			winrt::Windows::Graphics::DirectX::DirectXPixelFormat::B8G8R8A8UIntNormalized,
-			FramePool_NUMBER_BUFFER,
-			m_lastSize);//not work with D3D11_CREATE_DEVICE_SINGLETHREADED
-		m_session = m_framePool.CreateCaptureSession(m_item);
-		m_frameArrived = m_framePool.FrameArrived(winrt::auto_revoke, { this, &WinrtGraphicCapture::OnFrameArrived });
+		auto activation_factory = winrt::get_activation_factory<winrt::Windows::Graphics::Capture::GraphicsCaptureItem>();
+		auto interop_factory = activation_factory.as<IGraphicsCaptureItemInterop>();
 
-		if (WinrtGraphicCapture_IsCaptureCursorToggleSupported() && m_isSetCursorState != TRUE)
-			m_session.IsCursorCaptureEnabled(m_isSetCursorState);
-		if (WinrtGraphicCapture_IsBorderToggleSupported() && m_isSetBorderState != TRUE)
-			m_session.IsBorderRequired(m_isSetBorderState);
+		HRESULT hresult = interop_factory->CreateForMonitor(
+			HMONITOR,
+			winrt::guid_of<ABI::Windows::Graphics::Capture::IGraphicsCaptureItem>(),
+			reinterpret_cast<void**>(winrt::put_abi(m_item))
+		);
 
-		m_session.StartCapture();
+		if (SUCCEEDED(hresult))
+		{
+			m_closedToken = m_item.Closed({ this, &WinrtGraphicCapture::OnCaptureItemClosed });
+			m_lastSize = m_item.Size();
 
-		_isCapturing = true;
+			m_framePool = winrt::Windows::Graphics::Capture::Direct3D11CaptureFramePool::CreateFreeThreaded(
+				m_direct3d_device,
+				winrt::Windows::Graphics::DirectX::DirectXPixelFormat::B8G8R8A8UIntNormalized,
+				FramePool_NUMBER_BUFFER,
+				m_lastSize);//not work with D3D11_CREATE_DEVICE_SINGLETHREADED
+			m_session = m_framePool.CreateCaptureSession(m_item);
+			m_frameArrived = m_framePool.FrameArrived(winrt::auto_revoke, { this, &WinrtGraphicCapture::OnFrameArrived });
+
+			if (WinrtGraphicCapture_IsCaptureCursorToggleSupported() && m_isSetCursorState != TRUE)
+				m_session.IsCursorCaptureEnabled(m_isSetCursorState);
+			if (WinrtGraphicCapture_IsBorderToggleSupported() && m_isSetBorderState != TRUE)
+				m_session.IsBorderRequired(m_isSetBorderState);
+
+			m_session.StartCapture();
+
+			_isCapturing = true;
+		}
 	}
-
-	_mtx_lockInstance.unlock();
 
 	return TRUE;
 }
@@ -185,113 +186,110 @@ VOID WinrtGraphicCapture::OnFrameArrived(
 		return;
 	}
 
-	_mtx_lockInstance.lock();
-	if (_isCapturing)
 	{
-		auto frame = m_framePool.TryGetNextFrame();
-		if (!frame)
+		std::lock_guard<std::recursive_mutex> lockInstance(_mtx_lockInstance);
+		if (_isCapturing)
 		{
-			_mtx_lockInstance.unlock();
-			_activeCallbacks--;
-			_cv_callbacksComplete.notify_all();
-			return;
-		}
-
-		auto frameTime = frame.SystemRelativeTime();
-
-		// Throttling: Skip frame if not enough time has passed since last processed frame
-		if (m_delay > 0 && m_lastProcessedTime.count() > 0)
-		{
-			auto timeSinceLastFrame = frameTime.count() - m_lastProcessedTime.count();
-			auto delayInHundredNanoseconds = static_cast<int64_t>(m_delay) * 10000; // Convert ms to 100ns units
-
-			if (timeSinceLastFrame < delayInHundredNanoseconds)
+			auto frame = m_framePool.TryGetNextFrame();
+			if (!frame)
 			{
-				// Skip this frame - it arrived too quickly
-				frame.Close();
-				_mtx_lockInstance.unlock();
 				_activeCallbacks--;
 				_cv_callbacksComplete.notify_all();
 				return;
 			}
+
+			auto frameTime = frame.SystemRelativeTime();
+
+			// Throttling: Skip frame if not enough time has passed since last processed frame
+			if (m_delay > 0 && m_lastProcessedTime.count() > 0)
+			{
+				auto timeSinceLastFrame = frameTime.count() - m_lastProcessedTime.count();
+				auto delayInHundredNanoseconds = static_cast<int64_t>(m_delay) * 10000; // Convert ms to 100ns units
+
+				if (timeSinceLastFrame < delayInHundredNanoseconds)
+				{
+					// Skip this frame - it arrived too quickly
+					frame.Close();
+					_activeCallbacks--;
+					_cv_callbacksComplete.notify_all();
+					return;
+				}
+			}
+
+			auto newSize = false;
+			auto frameContentSize = frame.ContentSize();
+			if (frameContentSize.Width != m_lastSize.Width ||
+				frameContentSize.Height != m_lastSize.Height)
+			{
+				// The thing we have been capturing has changed size.
+				// We need to resize our swap chain first, then blit the pixels.
+				// After we do that, retire the frame and then recreate our frame pool.
+				newSize = true;
+				m_lastSize = frameContentSize;
+			}
+
+			auto frameSurface = GetDXGIInterfaceFromObject<ID3D11Texture2D>(frame.Surface());
+
+			//copy frame to cache
+			ComPtr<ID3D11Device> d3dDevice = this->_renderToSurface.GetDevive();
+			ComPtr<ID3D11DeviceContext> d3dDeviceCtx = this->_renderToSurface.GetDeviceContext();
+
+			HRESULT hr{ S_OK };
+			bool isRecreate = false;
+			D3D11_TEXTURE2D_DESC desc;
+			isRecreate = !_tmpFrame.Get();
+			if (!isRecreate)
+			{
+				_tmpFrame->GetDesc(&desc);
+				isRecreate = desc.Width != m_lastSize.Width || desc.Height != m_lastSize.Height;
+			}
+
+			//_renderToSurface.SendTexture(frameSurface.get());
+
+			if (isRecreate)
+			{
+				frameSurface->GetDesc(&desc);
+				//desc.Width = m_lastSize.Width;
+				//desc.Height = m_lastSize.Height;
+				desc.MipLevels = 1;
+				desc.ArraySize = 1;
+				desc.Format = DXGI_FORMAT::DXGI_FORMAT_B8G8R8A8_UNORM;
+				desc.SampleDesc.Count = 1;
+				desc.BindFlags = 0;//D3D11_BIND_FLAG
+				desc.Usage = D3D11_USAGE::D3D11_USAGE_STAGING;
+				desc.MiscFlags = 0;
+				desc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+				ComPtr<ID3D11Texture2D> tmpFrame;
+				hr = d3dDevice->CreateTexture2D(&desc, NULL, tmpFrame.GetAddressOf());
+
+				{
+					std::lock_guard<std::recursive_mutex> lockFrame(_mtx_lockFrame);
+					// Atomic swap to prevent race condition
+					ComPtr<ID3D11Texture2D> oldFrame = _tmpFrame;
+					_tmpFrame = tmpFrame.Get();
+				}
+			}
+			if (SUCCEEDED(hr))
+			{
+				d3dDeviceCtx->CopyResource(_tmpFrame.Get(), frameSurface.get());
+				m_lastTime = frameTime;
+				m_lastProcessedTime = frameTime;  // Update last processed time
+			}
+
+			if (newSize)
+			{
+				m_framePool.Recreate(
+					m_direct3d_device,
+					winrt::Windows::Graphics::DirectX::DirectXPixelFormat::B8G8R8A8UIntNormalized,
+					FramePool_NUMBER_BUFFER,
+					m_lastSize);
+			}
+
+			// No more Sleep - frame throttling is done via timestamp checking above
+
+			frame.Close();
 		}
-
-		auto newSize = false;
-		auto frameContentSize = frame.ContentSize();
-		if (frameContentSize.Width != m_lastSize.Width ||
-			frameContentSize.Height != m_lastSize.Height)
-		{
-			// The thing we have been capturing has changed size.
-			// We need to resize our swap chain first, then blit the pixels.
-			// After we do that, retire the frame and then recreate our frame pool.
-			newSize = true;
-			m_lastSize = frameContentSize;
-		}
-
-		auto frameSurface = GetDXGIInterfaceFromObject<ID3D11Texture2D>(frame.Surface());
-
-		//copy frame to cache
-		ComPtr<ID3D11Device> d3dDevice = this->_renderToSurface.GetDevive();
-		ComPtr<ID3D11DeviceContext> d3dDeviceCtx = this->_renderToSurface.GetDeviceContext();
-
-		HRESULT hr{ S_OK };
-		bool isRecreate = false;
-		D3D11_TEXTURE2D_DESC desc;
-		isRecreate = !_tmpFrame.Get();
-		if (!isRecreate)
-		{
-			_tmpFrame->GetDesc(&desc);
-			isRecreate = desc.Width != m_lastSize.Width || desc.Height != m_lastSize.Height;
-		}
-
-		//_renderToSurface.SendTexture(frameSurface.get());
-
-		if (isRecreate)
-		{
-			frameSurface->GetDesc(&desc);
-			//desc.Width = m_lastSize.Width;
-			//desc.Height = m_lastSize.Height;
-			desc.MipLevels = 1;
-			desc.ArraySize = 1;
-			desc.Format = DXGI_FORMAT::DXGI_FORMAT_B8G8R8A8_UNORM;
-			desc.SampleDesc.Count = 1;
-			desc.BindFlags = 0;//D3D11_BIND_FLAG
-			desc.Usage = D3D11_USAGE::D3D11_USAGE_STAGING;
-			desc.MiscFlags = 0;
-			desc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
-			ComPtr<ID3D11Texture2D> tmpFrame;
-			hr = d3dDevice->CreateTexture2D(&desc, NULL, tmpFrame.GetAddressOf());
-
-			_mtx_lockFrame.lock();
-			// Atomic swap to prevent race condition
-			ComPtr<ID3D11Texture2D> oldFrame = _tmpFrame;
-			_tmpFrame = tmpFrame.Get();
-			_mtx_lockFrame.unlock();
-
-			// Release old frame outside lock
-			oldFrame.Reset();
-		}
-		if (SUCCEEDED(hr))
-		{
-			d3dDeviceCtx->CopyResource(_tmpFrame.Get(), frameSurface.get());
-			m_lastTime = frameTime;
-			m_lastProcessedTime = frameTime;  // Update last processed time
-		}
-
-		if (newSize)
-		{
-			m_framePool.Recreate(
-				m_direct3d_device,
-				winrt::Windows::Graphics::DirectX::DirectXPixelFormat::B8G8R8A8UIntNormalized,
-				FramePool_NUMBER_BUFFER,
-				m_lastSize);
-		}
-
-		// No more Sleep - frame throttling is done via timestamp checking above
-
-		frame.Close();
 	}
-	_mtx_lockInstance.unlock();
 
 	// Mark callback as completed
 	_activeCallbacks--;
@@ -308,12 +306,13 @@ BOOL WinrtGraphicCapture::Render(IDXGISurface* surface, bool isNewSurface, bool&
 	{
 		result = _renderToSurface.InitializeSurface(surface, isNewSurface, isNewtargetView);
 
-		_mtx_lockFrame.lock();
-
-		ComPtr<ID3D11Texture2D> tmpFrame = _tmpFrame.Get();
-		winrt::Windows::Foundation::TimeSpan lastTime = m_lastTime;
-
-		_mtx_lockFrame.unlock();
+		ComPtr<ID3D11Texture2D> tmpFrame;
+		winrt::Windows::Foundation::TimeSpan lastTime;
+		{
+			std::lock_guard<std::recursive_mutex> lockFrame(_mtx_lockFrame);
+			tmpFrame = _tmpFrame.Get();
+			lastTime = m_lastTime;
+		}
 
 
 		if (tmpFrame.Get() &&
@@ -338,11 +337,11 @@ BOOL WinrtGraphicCapture::Render(IDXGISurface* surface, bool isNewSurface, bool&
 
 BOOL WinrtGraphicCapture::CaptureImage(void* data, UINT32 width, UINT32 height, UINT32 linesize)
 {
-	_mtx_lockFrame.lock();
-
-	ComPtr<ID3D11Texture2D> tmpFrame = _tmpFrame.Get();
-
-	_mtx_lockFrame.unlock();
+	ComPtr<ID3D11Texture2D> tmpFrame;
+	{
+		std::lock_guard<std::recursive_mutex> lockFrame(_mtx_lockFrame);
+		tmpFrame = _tmpFrame.Get();
+	}
 
 	BOOL result = FALSE;
 	D3D11_TEXTURE2D_DESC desc;
@@ -393,59 +392,60 @@ VOID WinrtGraphicCapture::OnCaptureItemClosed(winrt::Windows::Graphics::Capture:
 }
 VOID WinrtGraphicCapture::Close()
 {
-	_mtx_lockInstance.lock();
-
-	if (_isCapturing)
 	{
-		// Set flag first to prevent new operations
-		_isCapturing = false;
+		std::unique_lock<std::recursive_mutex> lockInstance(_mtx_lockInstance);
 
-		// Revoke frame callback first to stop new frames
-		m_frameArrived.revoke();
+		if (_isCapturing)
+		{
+			// Set flag first to prevent new operations
+			_isCapturing = false;
 
-		// Wait for all active callbacks to finish using condition variable
-		_cv_callbacksComplete.wait_for(
-			_mtx_lockInstance, 
-			std::chrono::milliseconds(100), 
-			[this]() {
-				return _activeCallbacks.load() == 0;
+			// Revoke frame callback first to stop new frames
+			m_frameArrived.revoke();
+
+			// Wait for all active callbacks to finish using condition variable
+			_cv_callbacksComplete.wait_for(
+				lockInstance, 
+				std::chrono::milliseconds(100), 
+				[this]() {
+					return _activeCallbacks.load() == 0;
+				}
+			);
+
+			// Close session to stop capture
+			if (m_session)
+			{
+				try { m_session.Close(); }
+				catch (...) { /* Ignore errors during cleanup */ }
 			}
-		);
 
-		// Close session to stop capture
-		if (m_session)
-		{
-			try { m_session.Close(); }
-			catch (...) { /* Ignore errors during cleanup */ }
+			// Close frame pool
+			if (m_framePool)
+			{
+				try { m_framePool.Close(); }
+				catch (...) { /* Ignore errors during cleanup */ }
+			}
+
+			// Unregister closed event only if item is valid and token is set
+			if (m_item && m_closedToken.value != 0)
+			{
+				try { m_item.Closed(m_closedToken); }
+				catch (...) { /* Ignore errors during cleanup */ }
+			}
+
+			// Clear references
+			m_session = nullptr;
+			m_framePool = nullptr;
+			m_item = nullptr;
+			m_closedToken = {};
 		}
-
-		// Close frame pool
-		if (m_framePool)
-		{
-			try { m_framePool.Close(); }
-			catch (...) { /* Ignore errors during cleanup */ }
-		}
-
-		// Unregister closed event only if item is valid and token is set
-		if (m_item && m_closedToken.value != 0)
-		{
-			try { m_item.Closed(m_closedToken); }
-			catch (...) { /* Ignore errors during cleanup */ }
-		}
-
-		// Clear references
-		m_session = nullptr;
-		m_framePool = nullptr;
-		m_item = nullptr;
-		m_closedToken = {};
 	}
 
-	_mtx_lockInstance.unlock();
-
 	// Clear frame buffer outside instance lock to prevent deadlock
-	_mtx_lockFrame.lock();
-	_tmpFrame.Reset();
-	_mtx_lockFrame.unlock();
+	{
+		std::lock_guard<std::recursive_mutex> lockFrame(_mtx_lockFrame);
+		_tmpFrame.Reset();
+	}
 }
 
 BOOL WinrtGraphicCapture::GetSize(UINT32& width, UINT32& height)
@@ -457,80 +457,64 @@ BOOL WinrtGraphicCapture::GetSize(UINT32& width, UINT32& height)
 
 BOOL WinrtGraphicCapture::SetCursorState(BOOL isVisible)
 {
-	BOOL result = FALSE;
-	_mtx_lockInstance.lock();
+	std::lock_guard<std::recursive_mutex> lock(_mtx_lockInstance);
 
 	if (_isCapturing)
 	{
 		m_session.IsCursorCaptureEnabled(isVisible);
-		result = TRUE;
 	}
 	else
 	{
 		m_isSetCursorState = isVisible;
-		result = TRUE;
 	}
 
-	_mtx_lockInstance.unlock();
-	return result;
+	return TRUE;
 }
 BOOL WinrtGraphicCapture::GetCursorState(BOOL& state)
 {
-	BOOL result = FALSE;
-	_mtx_lockInstance.lock();
+	std::lock_guard<std::recursive_mutex> lock(_mtx_lockInstance);
 
 	if (_isCapturing)
 	{
 		state = m_session.IsCursorCaptureEnabled();
-		result = TRUE;
 	}
 	else
 	{
 		state = m_isSetCursorState;
-		result = TRUE;
 	}
 
-	_mtx_lockInstance.unlock();
-	return result;
+	return TRUE;
 }
 
 BOOL WinrtGraphicCapture::SetBorderState(BOOL isVisible)
 {
-	BOOL result = FALSE;
-	_mtx_lockInstance.lock();
+	std::lock_guard<std::recursive_mutex> lock(_mtx_lockInstance);
 
 	if (_isCapturing)
 	{
 		m_session.IsBorderRequired(isVisible);
-		result = TRUE;
 	}
 	else
 	{
 		m_isSetBorderState = isVisible;
-		result = TRUE;
 	}
 
-	_mtx_lockInstance.unlock();
-	return result;
+	return TRUE;
 }
 BOOL WinrtGraphicCapture::GetBorderState(BOOL& state)
 {
-	BOOL result = FALSE;
-	_mtx_lockInstance.lock();
+	std::lock_guard<std::recursive_mutex> lock(_mtx_lockInstance);
 
 	if (_isCapturing)
 	{
 		state = m_session.IsBorderRequired();
-		result = TRUE;
 	}
 	else
 	{
 		state = m_isSetBorderState;
-		result = TRUE;
 	}
 
-	_mtx_lockInstance.unlock();
-	return result;
+	return TRUE;
 }
 
 //BOOL WinrtGraphicCapture::GetMinUpdateInterval(BOOL& isVisible)
