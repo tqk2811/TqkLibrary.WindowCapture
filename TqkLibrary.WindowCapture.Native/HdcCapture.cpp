@@ -6,11 +6,12 @@ HdcCapture* HdcCapture_Alloc()
 }
 HdcCaptureMode HdcCapture_GetMode(HdcCapture* hdcCapture)
 {
+	if (!hdcCapture) return HdcCaptureMode_BitBlt;
 	return hdcCapture->GetMode();
 }
 VOID HdcCapture_SetMode(HdcCapture* hdcCapture, HdcCaptureMode mode)
 {
-	hdcCapture->SetMode(mode);
+	if (hdcCapture) hdcCapture->SetMode(mode);
 }
 
 
