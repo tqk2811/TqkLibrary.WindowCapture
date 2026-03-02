@@ -23,7 +23,15 @@
         internal static extern bool SetDllDirectory(string PathName);
 #endif
 
-        protected IntPtr Pointer { get { return _pointer; } }
+        private bool _disposed = false;
+        protected IntPtr Pointer
+        {
+            get
+            {
+                if (_disposed) throw new ObjectDisposedException(GetType().Name);
+                return _pointer;
+            }
+        }
         private IntPtr _pointer;
         readonly ReleaseNative _releaseNative;
         protected BaseNative(
@@ -47,7 +55,12 @@
 
         protected virtual void Dispose(bool disposing)
         {
-            _releaseNative.Invoke(ref _pointer);
+            if (!_disposed)
+            {
+                _releaseNative.Invoke(ref _pointer);
+                _disposed = true;
+            }
         }
     }
 }
+
