@@ -21,7 +21,8 @@ VOID HdcCapture_SetMode(HdcCapture* hdcCapture, HdcCaptureMode mode)
 HdcCapture::HdcCapture()
 {
 	this->_hdc = CreateCompatibleDC(NULL);
-	assert(this->_hdc);
+	if (!this->_hdc)
+		return;
 }
 HdcCapture::~HdcCapture()
 {
@@ -165,9 +166,11 @@ BOOL HdcCapture::CaptureImage(void* data, UINT32 width, UINT32 height, UINT32 li
 
 	dwBmpSize = bitmap.bmWidth * 4 * bitmap.bmHeight;
 
-	assert(width == bitmap.bmWidth);
-	assert(height == bitmap.bmHeight);
-	assert(dwBmpSize == height * linesize);
+	if (width != bitmap.bmWidth || height != bitmap.bmHeight || dwBmpSize != height * linesize)
+	{
+		result = FALSE;
+		goto end;
+	}
 
 	result = GetDIBits(this->_hdc, hBitmap, 0,
 		(UINT)bitmap.bmHeight,
