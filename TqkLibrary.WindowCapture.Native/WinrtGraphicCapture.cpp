@@ -192,6 +192,8 @@ VOID WinrtGraphicCapture::OnFrameArrived(
 		if (!frame)
 		{
 			_mtx_lockInstance.unlock();
+			_activeCallbacks--;
+			_cv_callbacksComplete.notify_all();
 			return;
 		}
 
@@ -208,6 +210,8 @@ VOID WinrtGraphicCapture::OnFrameArrived(
 				// Skip this frame - it arrived too quickly
 				frame.Close();
 				_mtx_lockInstance.unlock();
+				_activeCallbacks--;
+				_cv_callbacksComplete.notify_all();
 				return;
 			}
 		}
