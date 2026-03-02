@@ -23,12 +23,12 @@ bool RenderTextureSurfaceClass::Initialize(ID3D11Device* device, IUnknown* surfa
 		ComPtr<IDXGIResource> pDXGIResource;
 		HRESULT hr = surface->QueryInterface(__uuidof(IDXGIResource), (void**)pDXGIResource.GetAddressOf());
 		if (FAILED(hr))
-			false;
+			return false;
 
 		HANDLE sharedHandle;
 		hr = pDXGIResource->GetSharedHandle(&sharedHandle);
 		if (FAILED(hr))
-			false;
+			return false;
 
 		//pDXGIResource->Release();
 
@@ -36,12 +36,12 @@ bool RenderTextureSurfaceClass::Initialize(ID3D11Device* device, IUnknown* surfa
 		ComPtr<IUnknown> tempResource11;
 		hr = device->OpenSharedResource(sharedHandle, __uuidof(ID3D11Resource), (void**)tempResource11.GetAddressOf());
 		if (FAILED(hr))
-			false;
+			return false;
 
 		ComPtr<ID3D11Texture2D> pOutputResource;
 		hr = tempResource11->QueryInterface(__uuidof(ID3D11Texture2D), (void**)pOutputResource.GetAddressOf());
 		if (FAILED(hr))
-			false;
+			return false;
 		//tempResource11->Release();
 
 
