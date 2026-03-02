@@ -87,7 +87,12 @@ https://jrsoftware.org/ishelp/index.php?topic=winvernotes
         /// </summary>
         public int MaxFps
         {
-            get { return (int)(1000.0 / WinrtGraphicCapture_GetDelay(Pointer)); }
+            get
+            {
+                int delay = WinrtGraphicCapture_GetDelay(Pointer);
+                if (delay <= 0) return 0;
+                return (int)(1000.0 / delay);
+            }
             set
             {
                 if (value <= 0) WinrtGraphicCapture_SetDelay(Pointer, 0);
