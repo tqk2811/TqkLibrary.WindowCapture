@@ -497,7 +497,7 @@ BOOL WinrtGraphicCapture::SetBorderState(BOOL isVisible)
 
 	if (_isCapturing)
 	{
-		m_session.IsCursorCaptureEnabled(isVisible);
+		m_session.IsBorderRequired(isVisible);
 		result = TRUE;
 	}
 	else
@@ -516,7 +516,7 @@ BOOL WinrtGraphicCapture::GetBorderState(BOOL& state)
 
 	if (_isCapturing)
 	{
-		state = m_session.IsCursorCaptureEnabled();
+		state = m_session.IsBorderRequired();
 		result = TRUE;
 	}
 	else
