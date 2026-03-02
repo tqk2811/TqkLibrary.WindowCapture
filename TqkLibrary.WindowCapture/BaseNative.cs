@@ -7,8 +7,13 @@
 #if DEBUG && NETFRAMEWORK
         static BaseNative()
         {
+            var entryAssembly = Assembly.GetEntryAssembly();
+            if (entryAssembly == null) return;
+            string? dir = Path.GetDirectoryName(entryAssembly.Location);
+            if (dir == null) return;
+
             string path = Path.Combine(
-                Path.GetDirectoryName(Assembly.GetEntryAssembly()!.Location)!,
+                dir,
                 "runtimes",
                 Environment.Is64BitProcess ? "win-x64" : "win-x86",
                 "native"
